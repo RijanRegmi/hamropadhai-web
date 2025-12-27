@@ -1,0 +1,135 @@
+.auth-wrapper {
+  min-height: 96vh;
+  width: 99vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.paragraph{
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 26px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+/* .auth-card {
+  width: 1000px;
+  height: 520px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+} */
+
+.auth-card {
+  position: relative;
+  z-index: 2;
+  width: 1000px;
+  height: 520px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
+}
+
+/* .auth-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1;
+} */
+
+/* 🔁 Reverse layout for signup */
+.auth-card.reverse {
+  direction: rtl;
+}
+
+.auth-card.reverse > * {
+  direction: ltr;
+}
+
+.auth-form {
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-purple {
+  background: rgba(160, 32, 240, 0.95);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+}
+
+.auth-logo {
+  margin-bottom: 20px;
+}
+
+.auth-title {
+  font-size: 26px;
+  margin-bottom: 24px;
+}
+
+.auth-input {
+  padding: 13px 14px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f1f1;
+}
+
+.auth-btn {
+  background: #a020f0;
+  color: white;
+  padding: 13px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+.auth-switch-btn {
+  background: #facc15;
+  color: black;
+  padding: 10px 28px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-top: 10px;
+}
+
+.gender-group{
+    /* gapebetween: 10px; */
+    display: flex;
+    gap: 200px;
+    padding-bottom: 20px;
+}
