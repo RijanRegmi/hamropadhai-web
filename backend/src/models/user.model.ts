@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
   {
@@ -8,25 +8,30 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      unique: true,
       required: true,
+      unique: true,
     },
     phone: {
       type: String,
-      unique: true,
       required: true,
     },
     password: {
       type: String,
       required: true,
     },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+      required: true,
+    },
     role: {
       type: String,
-      enum: ["user", "admin"],
       default: "user",
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export const User = model("User", userSchema);
+export const User = mongoose.model("User", userSchema);

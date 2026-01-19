@@ -1,62 +1,75 @@
+/* 
+.auth-card,
+.auth-form,
+.auth-purple {
+  transition: all 0.6s ease-in-out;
+}
+
+.auth-card .auth-form {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.auth-card .auth-purple {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.auth-card.reverse .auth-form {
+  transform: translateX(100%);
+}
+
+.auth-card.reverse .auth-purple {
+  transform: translateX(-100%);
+} */
+
+
+
+
+/* ===============================
+   AUTH WRAPPER
+================================ */
 .auth-wrapper {
-  min-height: 96vh;
-  width: 99vw;
+  min-height: 100vh;
+  width: 100vw;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative;
 }
 
-.heading {
-  text-align: center;
-  margin-bottom: 24px;
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.paragraph{
-    text-align: center;
-    margin-bottom: 24px;
-    font-size: 26px;
-    font-weight: 500;
-    color: #ffffff;
-}
-
-/* .auth-card {
-  width: 1000px;
-  height: 520px;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
-} */
-
+/* ===============================
+   AUTH CARD (MAIN BOX)
+================================ */
 .auth-card {
   position: relative;
   z-index: 2;
-  width: 1000px;
-  height: 520px;
-  background: #fff;
-  border-radius: 16px;
+
+  /* 🔥 75% of screen */
+  width: 75vw;
+  height: 75vh;
+
+  max-width: 1200px;
+  max-height: 680px;
+  min-width: 900px;
+  min-height: 520px;
+
+  background: #ffffff;
+  border-radius: 20px;
   overflow: hidden;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
+
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.35);
 }
 
-/* .auth-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 1;
-} */
-
-/* 🔁 Reverse layout for signup */
+/* 🔁 Reverse layout (Signup) */
 .auth-card.reverse {
   direction: rtl;
 }
@@ -65,71 +78,188 @@
   direction: ltr;
 }
 
+/* ===============================
+   LEFT SIDE FORM
+================================ */
 .auth-form {
-  padding: 48px;
+  padding: 64px;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.auth-purple {
-  background: rgba(160, 32, 240, 0.95);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 40px;
-}
-
-.auth-logo {
-  margin-bottom: 20px;
 }
 
 .auth-title {
-  font-size: 26px;
-  margin-bottom: 24px;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 28px;
 }
 
+/* ===============================
+   INPUTS
+================================ */
 .auth-input {
-  padding: 13px 14px;
-  margin-bottom: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+
   border-radius: 8px;
   border: none;
-  background: #f1f1f1;
+  outline: none;
+
+  background: #f2f2f2;
+  font-size: 15px;
 }
 
+/* ===============================
+   BUTTONS
+================================ */
 .auth-btn {
   background: #a020f0;
-  color: white;
-  padding: 13px;
+  color: #ffffff;
+
+  padding: 14px;
+  margin-top: 10px;
+
   border-radius: 8px;
   border: none;
   cursor: pointer;
+
+  font-size: 16px;
+  font-weight: 600;
   width: 100%;
 }
 
-.auth-switch-btn {
-  background: #facc15;
-  color: black;
-  padding: 10px 28px;
-  border-radius: 999px;
-  font-weight: 600;
-  text-decoration: none;
+.auth-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
+/* ===============================
+   ROW (REMEMBER / FORGOT)
+================================ */
 .auth-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-top: 10px;
+
+  margin-top: 14px;
+  font-size: 14px;
 }
 
-.gender-group{
-    /* gapebetween: 10px; */
-    display: flex;
-    gap: 200px;
-    padding-bottom: 20px;
+/* ===============================
+   RIGHT PURPLE PANEL
+================================ */
+.auth-purple {
+  background: rgba(160, 32, 240, 0.95);
+  color: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding: 64px;
+  text-align: center;
+}
+
+.auth-logo {
+  margin-bottom: 22px;
+}
+
+.heading {
+  font-size: 34px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.paragraph {
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+
+/* ===============================
+   SWITCH BUTTON
+================================ */
+.auth-switch-btn {
+  background: #facc15;
+  color: #000000;
+
+  padding: 12px 32px;
+  border-radius: 999px;
+
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ===============================
+   GENDER RADIO
+================================ */
+.gender-group {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+/* ===============================
+   TABLET RESPONSIVE
+================================ */
+@media (max-width: 1024px) {
+  .auth-card {
+    width: 90vw;
+    height: auto;
+    min-width: unset;
+    min-height: unset;
+    grid-template-columns: 1fr;
+  }
+
+  .auth-purple {
+    display: none;
+  }
+
+  .auth-form {
+    padding: 48px;
+  }
+}
+
+/* ===============================
+   MOBILE RESPONSIVE
+================================ */
+@media (max-width: 600px) {
+  .auth-wrapper {
+    padding: 16px;
+  }
+
+  .auth-card {
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .auth-form {
+    padding: 32px 24px;
+  }
+
+  .auth-title {
+    font-size: 26px;
+  }
+
+  .auth-input {
+    font-size: 14px;
+  }
+
+  .auth-btn {
+    font-size: 15px;
+  }
+
+  .auth-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .gender-group {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
