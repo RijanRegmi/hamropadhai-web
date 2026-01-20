@@ -3,41 +3,39 @@
 import Link from "next/link";
 import AuthLayout from "./AuthLayout";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoginData, loginSchema } from "./../schema";
+import { handleLogin } from "./../../../lib/actions/auth-action";
 
 export default function LoginForm() {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onSubmit",
+  });
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [pending, setTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
-  const submit = async () => {
-    try {
-      setLoading(true);
-
-      const res = await fetch("http://localhost:5050/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Login failed");
-        return;
+  const submit = async (values: LoginData) => {
+    setError(null);
+    setTransition(async () => {
+      try {
+        const response = await handleLogin(values);
+        if (!response.success) {
+          throw new Error(response.message);
+        }
+        router.push("/dashboard");
+      } catch (err: any) {
+        setError(err.message || "Login failed");
       }
-
-      // optional: save token
-      localStorage.setItem("token", data.token);
-
-      router.push("/dashboard");
-    } catch (err) {
-      alert("Backend not reachable");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -47,23 +45,34 @@ export default function LoginForm() {
       switchLink="/register"
       switchLabel="Sign up"
     >
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
       <input
         className="auth-input"
         placeholder="Email or Phone Number"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        type="email"
+        {...register("email")}
       />
+      {errors.email?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>
+      )}
 
       <input
         type="password"
         className="auth-input"
         placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        {...register("password")}
       />
+      {errors.password?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.password.message}</p>
+      )}
 
-      <button className="auth-btn" onClick={submit} disabled={loading}>
-        {loading ? "Signing in..." : "Sign in"}
+      <button
+        onClick={handleSubmit(submit)}
+        className="auth-btn"
+        disabled={isSubmitting || pending}
+      >
+        {isSubmitting || pending ? "Signing in..." : "Sign in"}
       </button>
 
       <div className="auth-row">

@@ -1,11 +1,13 @@
-import Link from "next/link";
-export default function Page() {
+import { handleLogout } from "./../../../lib/actions/auth-action";
+
+export default function Dashboard() {
   return (
     <div>
       <h1>This is Dashboard page</h1>
-      <Link href="/login">
-        <button>Signout</button>
-      </Link>
+
+      <form action={handleLogout}>
+        <button type="submit">Signout</button>
+      </form>
     </div>
   );
 }

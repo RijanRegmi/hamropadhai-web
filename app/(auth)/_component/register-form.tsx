@@ -2,61 +2,40 @@
 
 import AuthLayout from "./AuthLayout";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RegisterData, registerSchema } from ".././schema";
+import { handleRegister } from "./../../../lib/actions/auth-action";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterData>({
+    resolver: zodResolver(registerSchema),
+    mode: "onSubmit",
+  });
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [gender, setGender] = useState(""); // ✅ FIXED
-  const [loading, setLoading] = useState(false);
+  const [pending, setTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
-  const submit = async () => {
-    // ✅ frontend validation
-    if (!gender) {
-      alert("Please select your gender");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const res = await fetch("http://localhost:5050/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fullName,
-          email,
-          phone,
-          password,
-          gender,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message || "Registration failed");
-        console.error(data.errors);
-        return;
+  const submit = async (values: RegisterData) => {
+    setError(null);
+    setTransition(async () => {
+      try {
+        const response = await handleRegister(values);
+        if (!response.success) {
+          throw new Error(response.message);
+        }
+        alert("Account created successfully");
+        router.push("/login");
+      } catch (err: any) {
+        setError(err.message || "Registration failed");
       }
-
-      alert("Account created successfully");
-      router.push("/login");
-    } catch (err) {
-      alert("Backend not reachable");
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   return (
@@ -67,68 +46,77 @@ export default function RegisterForm() {
       switchLabel="Sign in"
       reverse
     >
+      {error && <p className="text-sm text-red-600">{error}</p>}
+
       <input
         className="auth-input"
         placeholder="Full Name"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
+        {...register("fullName")}
       />
+      {errors.fullName?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.fullName.message}</p>
+      )}
 
       <input
         className="auth-input"
         placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        type="email"
+        {...register("email")}
       />
+      {errors.email?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>
+      )}
 
       <input
         className="auth-input"
         placeholder="Phone Number"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
+        {...register("phone")}
       />
+      {errors.phone?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.phone.message}</p>
+      )}
 
       <input
         type="password"
         className="auth-input"
         placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        {...register("password")}
       />
+      {errors.password?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.password.message}</p>
+      )}
 
       <input
         type="password"
         className="auth-input"
         placeholder="Confirm Password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
+        {...register("confirmPassword")}
       />
+      {errors.confirmPassword?.message && (
+        <p className="text-xs text-red-600 mt-1">
+          {errors.confirmPassword.message}
+        </p>
+      )}
 
-      {/* ✅ UI NOT CHANGED */}
       <div className="gender-group">
         <label>
-          <input
-            type="radio"
-            name="gender"
-            value="male"
-            onChange={() => setGender("male")}
-          />{" "}
-          Male
+          <input type="radio" value="male" {...register("gender")} /> Male
         </label>
 
         <label>
-          <input
-            type="radio"
-            name="gender"
-            value="female"
-            onChange={() => setGender("female")}
-          />{" "}
-          Female
+          <input type="radio" value="female" {...register("gender")} /> Female
         </label>
       </div>
+      {errors.gender?.message && (
+        <p className="text-xs text-red-600">{errors.gender.message}</p>
+      )}
 
-      <button className="auth-btn" onClick={submit} disabled={loading}>
-        {loading ? "Signing up..." : "Sign up"}
+      <button
+        onClick={handleSubmit(submit)}
+        className="auth-btn"
+        disabled={isSubmitting || pending}
+      >
+        {isSubmitting || pending ? "Signing up..." : "Sign up"}
       </button>
     </AuthLayout>
   );
