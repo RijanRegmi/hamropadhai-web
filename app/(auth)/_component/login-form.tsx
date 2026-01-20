@@ -22,12 +22,13 @@ export default function LoginForm() {
 
   const [pending, setTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const submit = async (values: LoginData) => {
     setError(null);
     setTransition(async () => {
       try {
-        const response = await handleLogin(values);
+        const response = await handleLogin({ ...values, rememberMe });
         if (!response.success) {
           throw new Error(response.message);
         }
@@ -40,12 +41,12 @@ export default function LoginForm() {
 
   return (
     <AuthLayout
-      title="Sign in"
+      title="LOGIN"
       switchText="Don't have an account?"
       switchLink="/register"
       switchLabel="Sign up"
     >
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
       <input
         className="auth-input"
@@ -72,12 +73,18 @@ export default function LoginForm() {
         className="auth-btn"
         disabled={isSubmitting || pending}
       >
-        {isSubmitting || pending ? "Signing in..." : "Sign in"}
+        {isSubmitting || pending ? "Logging in..." : "Log in"}
       </button>
 
       <div className="auth-row">
-        <label>
-          <input type="checkbox" /> Remember me
+        <label className="remember-me-label">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="remember-me-checkbox"
+          />
+          Remember me
         </label>
         <span>Forgot Password</span>
       </div>

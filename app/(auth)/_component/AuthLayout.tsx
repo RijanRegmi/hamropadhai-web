@@ -3,7 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "./../../../assets/images/logo1.png";
+import books from "./../../../assets/images/books.png";
 import bg from "./../../../assets/images/loginbg.jpg";
+import logo1 from "./../../../assets/images/logo.png";
 
 interface Props {
   title: string;
@@ -33,10 +35,21 @@ export default function AuthLayout({
 
       <div className={`auth-card ${reverse ? "reverse" : ""}`}>
         <div className="auth-form">
+          {/* Logo ONLY for mobile/tablet - hidden on desktop */}
+          <div className="auth-mobile-logo">
+            <Image src={logo1} alt="Logo" width={90} height={90} />
+          </div>
+
           <h2 className="auth-title">{title}</h2>
           {children}
+
+          {/* Mobile switch link */}
+          <div className="auth-mobile-switch">
+            {switchText} <Link href={switchLink}>{switchLabel}</Link>
+          </div>
         </div>
 
+        {/* Desktop purple panel */}
         <div className="auth-purple">
           <Image
             src={Logo}

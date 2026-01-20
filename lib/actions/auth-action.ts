@@ -29,10 +29,12 @@ export const handleRegister = async (data: RegisterData) => {
 
 export const handleLogin = async (data: LoginData) => {
   try {
-    const response = await login(data);
+    const { rememberMe, ...loginCredentials } = data;
+    const response = await login(loginCredentials);
+    
     if (response.success) {
-      await setAuthToken(response.token);
-      await setUserData(response.data);
+      await setAuthToken(response.token, rememberMe || false);
+      await setUserData(response.data, rememberMe || false);
       return {
         success: true,
         message: "Login successful",
@@ -50,7 +52,6 @@ export const handleLogin = async (data: LoginData) => {
     };
   }
 };
-
 
 export const handleLogout = async () => {
   await clearAuthCookies();
