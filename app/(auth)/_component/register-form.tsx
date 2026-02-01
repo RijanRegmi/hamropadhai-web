@@ -33,7 +33,18 @@ export default function RegisterForm() {
         alert("Account created successfully");
         router.push("/login");
       } catch (err: any) {
-        setError(err.message || "Registration failed");
+        let errorMessage = err.message || "Registration failed";
+
+        // Parse specific error messages
+        if (errorMessage.includes("Username already exists")) {
+          errorMessage = "Username already exists";
+        } else if (errorMessage.includes("Email already exists")) {
+          errorMessage = "Email already exists";
+        } else if (errorMessage.includes("Phone number already exists")) {
+          errorMessage = "Phone number already exists";
+        }
+
+        setError(errorMessage);
       }
     });
   };
@@ -46,7 +57,7 @@ export default function RegisterForm() {
       switchLabel="Sign in"
       reverse
     >
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
       <input
         className="auth-input"
@@ -55,6 +66,16 @@ export default function RegisterForm() {
       />
       {errors.fullName?.message && (
         <p className="text-xs text-red-600 mt-1">{errors.fullName.message}</p>
+      )}
+
+      <input
+        className="auth-input"
+        placeholder="Username"
+        type="text"
+        {...register("username")}
+      />
+      {errors.username?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.username.message}</p>
       )}
 
       <input

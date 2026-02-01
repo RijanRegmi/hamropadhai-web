@@ -3,7 +3,7 @@
 import Link from "next/link";
 import AuthLayout from "./AuthLayout";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginData, loginSchema } from "./../schema";
@@ -20,23 +20,27 @@ export default function LoginForm() {
     mode: "onSubmit",
   });
 
-  const [pending, setTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [rememberMe, setRememberMe] = useState(false);
 
   const submit = async (values: LoginData) => {
     setError(null);
-    setTransition(async () => {
-      try {
-        const response = await handleLogin({ ...values, rememberMe });
-        if (!response.success) {
-          throw new Error(response.message);
-        }
-        router.push("/dashboard");
-      } catch (err: any) {
-        setError(err.message || "Login failed");
+
+    try {
+      const response = await handleLogin({ ...values, rememberMe });
+
+      console.log("Login response:", response);
+
+      if (!response.success) {
+        setError(response.message || "Login failed");
+        return;
       }
-    });
+
+      window.location.href = "/dashboard";
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err.message || "Login failed. Please try again.");
+    }
   };
 
   return (
@@ -50,12 +54,12 @@ export default function LoginForm() {
 
       <input
         className="auth-input"
-        placeholder="Email or Phone Number"
-        type="email"
-        {...register("email")}
+        placeholder="Username"
+        type="text"
+        {...register("username")}
       />
-      {errors.email?.message && (
-        <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>
+      {errors.username?.message && (
+        <p className="text-xs text-red-600 mt-1">{errors.username.message}</p>
       )}
 
       <input
@@ -71,9 +75,9 @@ export default function LoginForm() {
       <button
         onClick={handleSubmit(submit)}
         className="auth-btn"
-        disabled={isSubmitting || pending}
+        disabled={isSubmitting}
       >
-        {isSubmitting || pending ? "Logging in..." : "Log in"}
+        {isSubmitting ? "Logging in..." : "Log in"}
       </button>
 
       <div className="auth-row">
@@ -86,7 +90,12 @@ export default function LoginForm() {
           />
           Remember me
         </label>
-        <span>Forgot Password</span>
+        <Link
+          href="/forgot-password"
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Forgot Password?
+        </Link>
       </div>
     </AuthLayout>
   );

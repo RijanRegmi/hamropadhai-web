@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
-export async function proxy(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  
-  const cookieStore = await cookies();
-  const token = cookieStore.get('auth_token')?.value;
 
-  if ((pathname === "/login" || pathname === "/register") && token) {
+  // ✅ accept both cookie names
+  const token =
+    req.cookies.get("token")?.value ||
+    req.cookies.get("auth_token")?.value;
+
+  const publicRoutes = ["/login", "/register", "/forgot-password"];
+  const isPublicRoute = publicRoutes.some(route =>
+    pathname.startsWith(route)
+  );
+
+  if (token && isPublicRoute) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (pathname.startsWith("/dashboard") && !token) {
+  if (!token && !isPublicRoute && pathname !== "/") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -20,9 +26,6 @@ export async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/api/:path*",
-    "/login",
-    "/register",
-    "/dashboard/:path*",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };

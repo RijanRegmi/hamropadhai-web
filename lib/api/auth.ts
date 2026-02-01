@@ -16,6 +16,16 @@ export const register = async (registerData: RegisterData) => {
 export const login = async (loginData: LoginData) => {
   try {
     const response = await axios.post(API.AUTH.LOGIN, loginData);
+    
+    if (response.data.success && response.data.data) {
+      return {
+        success: true,
+        message: response.data.message,
+        token: response.data.data.token,
+        data: response.data.data.user,
+      };
+    }
+    
     return response.data;
   } catch (error: any) {
     throw new Error(
