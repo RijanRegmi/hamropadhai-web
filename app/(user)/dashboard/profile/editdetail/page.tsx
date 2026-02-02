@@ -7,6 +7,9 @@ import {
   updateProfileAction,
 } from "../../../../../lib/actions/profile-action";
 import "./editdetail.css";
+import book from "./../../../../../assets/images/books.png";
+import HamroPadhai from "./../../../../../assets/images/HamroPadhai.png";
+import Image from "next/image";
 
 interface UserProfile {
   _id: string;
@@ -50,7 +53,6 @@ export default function EditDetailPage() {
         return;
       }
       setProfile(result.data);
-      // FIXED: Load all fields from database
       setForm({
         fullName: result.data.fullName || "",
         about: result.data.about || "",

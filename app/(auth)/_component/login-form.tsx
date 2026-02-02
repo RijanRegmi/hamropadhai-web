@@ -36,7 +36,12 @@ export default function LoginForm() {
         return;
       }
 
-      window.location.href = "/dashboard";
+      // ✅ REDIRECT BASED ON ROLE
+      if (response.data?.role === "admin") {
+        window.location.href = "/admin/users";
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (err: any) {
       console.error("Login error:", err);
       setError(err.message || "Login failed. Please try again.");

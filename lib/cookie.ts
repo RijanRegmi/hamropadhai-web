@@ -55,6 +55,11 @@ export const getUserData = async (): Promise<UserData | null> => {
     return userData ? JSON.parse(userData) : null;
 }
 
+export const getCurrentUserId = async (): Promise<string | null> => {
+    const userData = await getUserData();
+    return userData?._id || null;
+}
+
 export const clearAuthCookies = async () => {
     const cookieStore = await cookies();
     cookieStore.delete('auth_token');

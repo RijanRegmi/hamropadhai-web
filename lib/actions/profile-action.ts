@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050" || "http://192.168.1.6:3000";
 
 export async function getProfileData() {
   try {
@@ -79,13 +79,15 @@ export async function uploadProfileImageAction(formData: FormData) {
   }
 }
 
-// Complete type definition with ALL fields
+
 export async function updateProfileAction(data: {
   fullName?: string;
   email?: string;
   phone?: string;
   gender?: "male" | "female";
   about?: string;
+  classId?: string;
+  sectionId?: string;
   address?: string;
   parentContact?: string;
 }) {
