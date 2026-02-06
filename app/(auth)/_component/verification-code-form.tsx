@@ -131,6 +131,7 @@ export default function VerificationCodeForm() {
       switchText="Remember your password?"
       switchLink="/login"
       switchLabel="Sign in"
+      reverse
     >
       <div className="mb-6">
         <p className="text-sm text-gray-600 mb-2">

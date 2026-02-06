@@ -107,6 +107,7 @@ export default function ResetPasswordForm() {
       switchText="Remember your password?"
       switchLink="/login"
       switchLabel="Sign in"
+      reverse
     >
       <p className="text-sm text-gray-600 mb-6">
         Create a new password for your account.

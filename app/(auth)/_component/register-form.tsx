@@ -39,7 +39,6 @@ export default function RegisterForm() {
       } catch (err: any) {
         let errorMessage = err.message || "Registration failed";
 
-        // Parse specific error messages
         if (errorMessage.includes("Username already exists")) {
           errorMessage = "Username already exists";
         } else if (errorMessage.includes("Email already exists")) {

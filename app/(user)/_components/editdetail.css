@@ -1,0 +1,555 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   editdetail.css - Fixed mobile spacing only
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ed-page {
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* ─── header (same as profile) ───────────────────────────────────────────── */
+.ed-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  width: 100%;
+}
+
+.ed-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  gap: 1rem;
+}
+
+.ed-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ed-brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ed-brand-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ed-brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── main / card ────────────────────────────────────────────────────────── */
+.ed-content {
+  flex: 1;
+  max-width: 1000px;
+  width: 100%;
+  margin: 2rem auto 2rem;
+  padding: 0 1.5rem;
+  box-sizing: border-box;
+}
+
+.ed-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 44px 48px 48px;
+  box-sizing: border-box;
+}
+
+.ed-card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px;
+}
+
+.ed-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 36px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DESKTOP LAYOUT - Profile on left, form on right
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ed-desktop-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 48px;
+}
+
+.ed-mobile-layout {
+  display: none;
+}
+
+/* Profile Section (Left) */
+.ed-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding-top: 8px;
+}
+
+.ed-avatar-wrapper {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 4px solid #e5e7eb;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  background: #18b2a0;
+  transition: all 0.3s;
+}
+
+.ed-avatar-wrapper:hover {
+  border-color: #6366f1;
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.2);
+}
+
+.ed-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ed-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #18b2a0;
+  color: #fff;
+}
+
+/* Camera button - positioned OUTSIDE the avatar circle */
+.ed-camera-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #6366f1;
+  border: 4px solid #fff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  transition: all 0.3s;
+}
+
+.ed-avatar-wrapper:hover .ed-camera-btn {
+  background: #4f46e5;
+  transform: scale(1.1);
+}
+
+/* Upload overlay */
+.ed-avatar-upload-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 15;
+}
+
+.ed-upload-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: ed-spin 0.7s linear infinite;
+}
+
+@keyframes ed-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ed-file-input-hidden {
+  display: none;
+}
+
+.ed-profile-name {
+  display: none;
+}
+
+.ed-profile-username {
+  font-size: 16px;
+  color: #6b7280;
+  margin: 12px 0 0;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Form Section (Right) */
+.ed-form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── form grid ──────────────────────────────────────────────────────────── */
+.ed-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 32px;
+}
+
+.ed-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ed-field-full {
+  margin-top: 28px;
+  grid-column: 1 / -1;
+}
+
+.ed-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ed-input {
+  padding: 12px 16px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ed-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.ed-input::placeholder {
+  color: #9ca3af;
+}
+
+.ed-select {
+  appearance: auto;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+/* email display */
+.ed-email-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1e40af;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+.ed-email-display svg {
+  flex-shrink: 0;
+}
+
+.ed-email-display span {
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
+/* ─── action buttons ────────────────────────────────────────────────────── */
+.ed-desktop-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ed-btn-cancel {
+  padding: 14px 40px;
+  background: #ef4444;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ed-btn-cancel:hover {
+  background: #dc2626;
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.ed-btn-save {
+  padding: 14px 44px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.ed-btn-save:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  transform: translateY(-1px);
+}
+
+.ed-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── loading ────────────────────────────────────────────────────────────── */
+.ed-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.ed-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: ed-spin 0.8s linear infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE - MOBILE LAYOUT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet and Mobile */
+@media (max-width: 1023px) {
+  /* Hide desktop layout, show mobile layout */
+  .ed-desktop-layout {
+    display: none;
+  }
+
+  .ed-mobile-layout {
+    display: block;
+  }
+
+  .ed-content {
+    max-width: 860px;
+  }
+
+  /* Mobile Profile Section (top) */
+  .ed-mobile-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .ed-mobile-profile-section .ed-avatar-wrapper {
+    width: 180px;
+    height: 180px;
+  }
+
+  .ed-mobile-profile-section .ed-camera-btn {
+    width: 48px;
+    height: 48px;
+    bottom: 4px;
+    right: 4px;
+  }
+
+  .ed-desktop-actions {
+    margin-top: 28px;
+    padding-top: 24px;
+  }
+
+  .ed-desktop-actions .ed-btn-cancel,
+  .ed-desktop-actions .ed-btn-save {
+    flex: 1;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ed-header-inner {
+    padding: 0 1.5rem;
+  }
+
+  .ed-content {
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .ed-card {
+    padding: 32px 24px 36px;
+  }
+
+  .ed-form-grid {
+    gap: 20px 24px;
+  }
+}
+
+/* Mobile - FIXED SPACING */
+@media (max-width: 640px) {
+  .ed-header-inner {
+    padding: 0 1rem;
+    height: 56px;
+  }
+
+  .ed-brand-logo {
+    width: 34px;
+    height: 34px;
+  }
+
+  .ed-brand-title {
+    font-size: 18px;
+  }
+
+  .ed-content {
+    margin: 1rem auto 1rem;
+    padding: 0 0.75rem;
+  }
+
+  .ed-card {
+    padding: 28px 20px 32px;
+    border-radius: 16px;
+  }
+
+  .ed-card-title {
+    font-size: 22px;
+  }
+
+  .ed-form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .ed-field-full {
+    margin-top: 20px;
+    /* FIXED: Remove extra bottom margin */
+    margin-bottom: 0;
+  }
+
+  .ed-desktop-actions {
+    margin-top: 24px;
+    padding-top: 20px;
+    flex-direction: column;
+  }
+
+  .ed-desktop-actions .ed-btn-cancel,
+  .ed-desktop-actions .ed-btn-save {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .ed-mobile-profile-section .ed-avatar-wrapper {
+    width: 160px;
+    height: 160px;
+  }
+
+  .ed-mobile-profile-section .ed-camera-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .ed-header-inner {
+    padding: 0 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .ed-brand {
+    gap: 8px;
+  }
+
+  .ed-brand-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .ed-content {
+    padding: 0 0.5rem;
+    margin: 0.75rem auto 0.75rem;
+  }
+
+  .ed-card {
+    padding: 24px 16px 28px;
+  }
+
+  .ed-desktop-actions {
+    margin-top: 20px;
+    padding-top: 18px;
+  }
+
+  .ed-mobile-profile-section .ed-avatar-wrapper {
+    width: 150px;
+    height: 150px;
+  }
+}
