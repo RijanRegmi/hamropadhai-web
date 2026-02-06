@@ -19,7 +19,15 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  const publicRoutes = ["/login", "/register", "/forgot-password"];
+  // Public routes that don't require authentication
+  const publicRoutes = [
+    "/login", 
+    "/register", 
+    "/forgot-password",
+    "/verification-code",
+    "/reset-password"
+  ];
+  
   const isPublicRoute = publicRoutes.some(route =>
     pathname.startsWith(route)
   );
@@ -29,6 +37,7 @@ export function proxy(req: NextRequest) {
     pathname.startsWith(route)
   );
 
+  // If user is authenticated and tries to access public routes, redirect to appropriate dashboard
   if (token && isPublicRoute) {
     if (userRole === "admin") {
       return NextResponse.redirect(new URL("/admin/users", req.url));
@@ -36,14 +45,17 @@ export function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  // If user is not authenticated and tries to access protected routes, redirect to login
   if (!token && !isPublicRoute && pathname !== "/") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // If authenticated user tries to access admin routes without admin role, redirect to dashboard
   if (token && isAdminRoute && userRole !== "admin") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
+  // If admin user tries to access regular dashboard, redirect to admin dashboard
   if (token && pathname.startsWith("/dashboard") && userRole === "admin") {
     return NextResponse.redirect(new URL("/admin/users", req.url));
   }

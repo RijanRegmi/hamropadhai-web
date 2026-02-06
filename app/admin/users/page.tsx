@@ -7,6 +7,7 @@ import {
   deleteUserAction,
 } from "./../../../lib/actions/admin-action";
 import { getCurrentUserId } from "./../../../lib/cookie";
+import toast from "react-hot-toast";
 import "./users.css";
 
 interface User {
@@ -74,7 +75,7 @@ export default function UsersPage() {
       setIsLoading(true);
       const result = await getAllUsersAction();
       if (!result.success) {
-        alert(result.message || "Failed to fetch users");
+        toast.error(result.message || "Failed to fetch users");
         return;
       }
 
@@ -87,7 +88,7 @@ export default function UsersPage() {
       setUsers(filteredData);
       setFilteredUsers(filteredData);
     } catch (error: any) {
-      alert(error.message || "Failed to fetch users");
+      toast.error(error.message || "Failed to fetch users");
     } finally {
       setIsLoading(false);
     }
@@ -96,20 +97,21 @@ export default function UsersPage() {
   const handleDelete = async (userId: string) => {
     if (deleteConfirm !== userId) {
       setDeleteConfirm(userId);
+      setTimeout(() => setDeleteConfirm(null), 3000); // Reset after 3 seconds
       return;
     }
 
     try {
       const result = await deleteUserAction(userId);
       if (!result.success) {
-        alert(result.message || "Failed to delete user");
+        toast.error(result.message || "Failed to delete user");
         return;
       }
-      alert("User deleted successfully!");
+      toast.success(result.message || "User deleted successfully!");
       await fetchUsers(currentUserId);
       setDeleteConfirm(null);
     } catch (error: any) {
-      alert(error.message || "Failed to delete user");
+      toast.error(error.message || "Failed to delete user");
     }
   };
 
@@ -147,7 +149,10 @@ export default function UsersPage() {
                 const { clearAuthCookies } =
                   await import("./../../../lib/cookie");
                 await clearAuthCookies();
-                router.push("/login");
+                toast.success("Logged out successfully!");
+                setTimeout(() => {
+                  router.push("/login");
+                }, 1000);
               }}
             >
               Logout

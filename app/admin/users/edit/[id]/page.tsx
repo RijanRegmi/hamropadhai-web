@@ -6,6 +6,7 @@ import {
   getUserByIdAction,
   updateUserAction,
 } from "./../../../../../lib/actions/admin-action";
+import toast from "react-hot-toast";
 import "./user-form.css";
 
 interface User {
@@ -59,8 +60,10 @@ export default function EditUserPage() {
       setIsLoading(true);
       const result = await getUserByIdAction(userId);
       if (!result.success) {
-        alert(result.message || "Failed to fetch user");
-        router.push("/admin/users");
+        toast.error(result.message || "Failed to fetch user");
+        setTimeout(() => {
+          router.push("/admin/users");
+        }, 1500);
         return;
       }
       setUser(result.data);
@@ -84,8 +87,10 @@ export default function EditUserPage() {
         );
       }
     } catch (error: any) {
-      alert(error.message || "Failed to fetch user");
-      router.push("/admin/users");
+      toast.error(error.message || "Failed to fetch user");
+      setTimeout(() => {
+        router.push("/admin/users");
+      }, 1500);
     } finally {
       setIsLoading(false);
     }
@@ -113,23 +118,24 @@ export default function EditUserPage() {
     try {
       setIsSaving(true);
 
-      // Validation
       if (!form.fullName || !form.username || !form.email || !form.phone) {
-        alert("Please fill in all required fields");
+        toast.error("Please fill in all required fields");
         return;
       }
 
       const result = await updateUserAction(userId, form, profileImage);
 
       if (!result.success) {
-        alert(result.message || "Failed to update user");
+        toast.error(result.message || "Failed to update user");
         return;
       }
 
-      alert("User updated successfully!");
-      router.push("/admin/users");
+      toast.success(result.message || "User updated successfully!");
+      setTimeout(() => {
+        router.push("/admin/users");
+      }, 1000);
     } catch (error: any) {
-      alert(error.message || "Failed to update user");
+      toast.error(error.message || "Failed to update user");
     } finally {
       setIsSaving(false);
     }
@@ -233,6 +239,7 @@ export default function EditUserPage() {
                 name="fullName"
                 value={form.fullName}
                 onChange={onChange}
+                maxLength={50}
               />
             </div>
 
@@ -243,6 +250,13 @@ export default function EditUserPage() {
                 name="username"
                 value={form.username}
                 onChange={onChange}
+                autoCapitalize="none"
+                autoComplete="username"
+                maxLength={20}
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.toLowerCase();
+                }}
               />
             </div>
 
@@ -254,6 +268,7 @@ export default function EditUserPage() {
                 name="email"
                 value={form.email}
                 onChange={onChange}
+                maxLength={64}
               />
             </div>
 
@@ -264,6 +279,13 @@ export default function EditUserPage() {
                 name="phone"
                 value={form.phone}
                 onChange={onChange}
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
 
@@ -278,6 +300,7 @@ export default function EditUserPage() {
                 value={form.password}
                 onChange={onChange}
                 placeholder="••••••••"
+                maxLength={35}
               />
             </div>
 
@@ -314,6 +337,7 @@ export default function EditUserPage() {
                 name="about"
                 value={form.about}
                 onChange={onChange}
+                maxLength={60}
               />
             </div>
 
@@ -324,6 +348,7 @@ export default function EditUserPage() {
                 name="classId"
                 value={form.classId}
                 onChange={onChange}
+                maxLength={20}
               />
             </div>
 
@@ -334,6 +359,7 @@ export default function EditUserPage() {
                 name="sectionId"
                 value={form.sectionId}
                 onChange={onChange}
+                maxLength={20}
               />
             </div>
 
@@ -344,6 +370,7 @@ export default function EditUserPage() {
                 name="address"
                 value={form.address}
                 onChange={onChange}
+                maxLength={35}
               />
             </div>
 
@@ -354,6 +381,13 @@ export default function EditUserPage() {
                 name="parentContact"
                 value={form.parentContact}
                 onChange={onChange}
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
           </div>

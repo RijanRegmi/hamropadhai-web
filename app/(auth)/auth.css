@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 * {
@@ -117,6 +116,7 @@ html, body {
   color: #333;
   
   transition: all 0.2s ease;
+  width: 100%;
 }
 
 .auth-input:focus {
@@ -128,6 +128,40 @@ html, body {
 .auth-input::placeholder {
   color: #999;
   font-weight: 400;
+}
+
+/* Password input wrapper for positioning eye icon */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.password-input-wrapper .auth-input {
+  margin-bottom: 0;
+  padding-right: 50px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  width: 24px;
+  height: 24px;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #a020f0;
 }
 
 /* ===============================
@@ -424,6 +458,14 @@ html, body {
     flex-shrink: 0;
   }
 
+  .password-input-wrapper {
+    margin-bottom: 16px;
+  }
+
+  .password-input-wrapper .auth-input {
+    padding-right: 50px;
+  }
+
   .auth-btn {
     font-size: 16px;
     padding: 17px;
@@ -476,6 +518,10 @@ html, body {
     font-size: 14px;
     padding: 14px;
     padding-left: 42px;
+  }
+
+  .password-input-wrapper .auth-input {
+    padding-right: 45px;
   }
 
   .gender-group {

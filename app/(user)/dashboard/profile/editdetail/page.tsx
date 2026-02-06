@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import {
   getProfileData,
   updateProfileAction,
@@ -49,6 +50,7 @@ export default function EditDetailPage() {
       setIsLoading(true);
       const result = await getProfileData();
       if (!result.success) {
+        toast.error("Please login to continue");
         router.push("/login");
         return;
       }
@@ -62,6 +64,7 @@ export default function EditDetailPage() {
         parentContact: result.data.parentContact || "",
       });
     } catch {
+      toast.error("Failed to load profile");
       router.push("/login");
     } finally {
       setIsLoading(false);
@@ -78,7 +81,6 @@ export default function EditDetailPage() {
     try {
       setIsSaving(true);
 
-      // FIXED: Send ALL fields to backend
       const result = await updateProfileAction({
         fullName: form.fullName,
         phone: form.contactNumber,
@@ -89,14 +91,16 @@ export default function EditDetailPage() {
       });
 
       if (!result.success) {
-        alert(result.message || "Failed to update profile");
+        toast.error(result.message || "Failed to update profile");
         return;
       }
 
-      alert("Profile updated successfully!");
-      router.push("/dashboard/profile");
+      toast.success("Profile updated successfully!");
+      setTimeout(() => {
+        router.push("/dashboard/profile");
+      }, 1000);
     } catch (error: any) {
-      alert(error.message || "Failed to update profile");
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setIsSaving(false);
     }
@@ -149,7 +153,6 @@ export default function EditDetailPage() {
         </div>
       </header>
 
-      {/* ── form card ── */}
       <main className="ed-content">
         <div className="ed-card">
           <h2 className="ed-card-title">Edit Profile</h2>
@@ -163,6 +166,7 @@ export default function EditDetailPage() {
                 name="fullName"
                 value={form.fullName}
                 onChange={onChange}
+                maxLength={50}
               />
             </div>
 
@@ -174,6 +178,7 @@ export default function EditDetailPage() {
                 value={form.about}
                 onChange={onChange}
                 placeholder="About you"
+                maxLength={60}
               />
             </div>
 
@@ -198,6 +203,7 @@ export default function EditDetailPage() {
                 value={form.address}
                 onChange={onChange}
                 placeholder="Address"
+                maxLength={60}
               />
             </div>
 
@@ -208,6 +214,13 @@ export default function EditDetailPage() {
                 name="contactNumber"
                 value={form.contactNumber}
                 onChange={onChange}
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
 
@@ -219,6 +232,12 @@ export default function EditDetailPage() {
                 value={form.parentContact}
                 onChange={onChange}
                 placeholder="Parent contact"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserAction } from "./../../../../lib/actions/admin-action";
+import toast from "react-hot-toast";
 import "./user-form.css";
 
 export default function CreateUserPage() {
@@ -56,21 +57,23 @@ export default function CreateUserPage() {
         !form.phone ||
         !form.password
       ) {
-        alert("Please fill in all required fields");
+        toast.error("Please fill in all required fields");
         return;
       }
 
       const result = await createUserAction(form, profileImage);
 
       if (!result.success) {
-        alert(result.message || "Failed to create user");
+        toast.error(result.message || "Failed to create user");
         return;
       }
 
-      alert("User created successfully!");
-      router.push("/admin/users");
+      toast.success(result.message || "User created successfully!");
+      setTimeout(() => {
+        router.push("/admin/users");
+      }, 1000);
     } catch (error: any) {
-      alert(error.message || "Failed to create user");
+      toast.error(error.message || "Failed to create user");
     } finally {
       setIsSaving(false);
     }
@@ -156,6 +159,7 @@ export default function CreateUserPage() {
                 value={form.fullName}
                 onChange={onChange}
                 placeholder="John Doe"
+                maxLength={50}
               />
             </div>
 
@@ -167,6 +171,13 @@ export default function CreateUserPage() {
                 value={form.username}
                 onChange={onChange}
                 placeholder="johndoe"
+                autoCapitalize="none"
+                autoComplete="username"
+                maxLength={20}
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.toLowerCase();
+                }}
               />
             </div>
 
@@ -179,6 +190,7 @@ export default function CreateUserPage() {
                 value={form.email}
                 onChange={onChange}
                 placeholder="john@example.com"
+                maxLength={64}
               />
             </div>
 
@@ -190,6 +202,13 @@ export default function CreateUserPage() {
                 value={form.phone}
                 onChange={onChange}
                 placeholder="+977 9800000000"
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
 
@@ -202,6 +221,7 @@ export default function CreateUserPage() {
                 value={form.password}
                 onChange={onChange}
                 placeholder="••••••••"
+                maxLength={35}
               />
             </div>
 
@@ -239,6 +259,7 @@ export default function CreateUserPage() {
                 value={form.about}
                 onChange={onChange}
                 placeholder="About this user"
+                maxLength={60}
               />
             </div>
 
@@ -250,6 +271,7 @@ export default function CreateUserPage() {
                 value={form.classId}
                 onChange={onChange}
                 placeholder="class"
+                maxLength={20}
               />
             </div>
 
@@ -261,6 +283,7 @@ export default function CreateUserPage() {
                 value={form.sectionId}
                 onChange={onChange}
                 placeholder="Section"
+                maxLength={20}
               />
             </div>
 
@@ -272,6 +295,7 @@ export default function CreateUserPage() {
                 value={form.address}
                 onChange={onChange}
                 placeholder="Kathmandu, Nepal"
+                maxLength={35}
               />
             </div>
 
@@ -283,6 +307,13 @@ export default function CreateUserPage() {
                 value={form.parentContact}
                 onChange={onChange}
                 placeholder="+977 9800000001"
+                maxLength={10}
+                inputMode="numeric"
+                pattern="[0-9]*"
+                onInput={(e) => {
+                  const input = e.target as HTMLInputElement;
+                  input.value = input.value.replace(/[^0-9]/g, "");
+                }}
               />
             </div>
           </div>
