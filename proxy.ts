@@ -13,51 +13,77 @@ export function proxy(req: NextRequest) {
   if (userDataCookie) {
     try {
       const userData = JSON.parse(userDataCookie);
-      userRole = userData.role || null;
+      userRole = userData?.role ?? null;
     } catch (error) {
-      console.error("Error parsing user_data cookie:", error);
+      console.error("Invalid user_data cookie");
     }
   }
 
-  // Public routes that don't require authentication
+  // Public routes
   const publicRoutes = [
-    "/login", 
-    "/register", 
+    "/login",
+    "/register",
     "/forgot-password",
     "/verification-code",
-    "/reset-password"
+    "/reset-password",
   ];
-  
+
   const isPublicRoute = publicRoutes.some(route =>
     pathname.startsWith(route)
   );
 
+  // Role routes (match real folder paths)
   const adminRoutes = ["/admin"];
+  const teacherRoutes = ["/teacher"];
+
   const isAdminRoute = adminRoutes.some(route =>
     pathname.startsWith(route)
   );
 
-  // If user is authenticated and tries to access public routes, redirect to appropriate dashboard
+  const isTeacherRoute = teacherRoutes.some(route =>
+    pathname.startsWith(route)
+  );
+
+  // Logged-in users should not access auth pages
   if (token && isPublicRoute) {
     if (userRole === "admin") {
-      return NextResponse.redirect(new URL("/admin/users", req.url));
+      return NextResponse.redirect(new URL("/admin/dashboard", req.url));
     }
+
+    if (userRole === "teacher") {
+      return NextResponse.redirect(
+        new URL("/teacher/teacher-dashboard", req.url)
+      );
+    }
+
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  // If user is not authenticated and tries to access protected routes, redirect to login
+  // Not logged in → protect routes
   if (!token && !isPublicRoute && pathname !== "/") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // If authenticated user tries to access admin routes without admin role, redirect to dashboard
+  // Admin accessing non-admin pages
+  if (token && userRole === "admin" && !isAdminRoute && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+  }
+
+  // Teacher accessing non-teacher pages
+  if (token && userRole === "teacher" && !isTeacherRoute && !isPublicRoute) {
+    return NextResponse.redirect(
+      new URL("/teacher/dashboard", req.url)
+    );
+  }
+
+  // Non-admin accessing admin routes
   if (token && isAdminRoute && userRole !== "admin") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  // If admin user tries to access regular dashboard, redirect to admin dashboard
-  if (token && pathname.startsWith("/dashboard") && userRole === "admin") {
-    return NextResponse.redirect(new URL("/admin/users", req.url));
+  // Non-teacher accessing teacher routes
+  if (token && isTeacherRoute && userRole !== "teacher") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();

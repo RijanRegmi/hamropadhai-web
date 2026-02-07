@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   getUserByIdAction,
   updateUserAction,
-} from "./../../../../../lib/actions/admin-action";
+  uploadUserProfileImageAction,
+} from "../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
 import "./user-form.css";
 
@@ -19,9 +20,9 @@ interface User {
   role: string;
   profileImage: string | null;
   about?: string;
-  address?: string;
   classId?: string;
   sectionId?: string;
+  address?: string;
   parentContact?: string;
 }
 
@@ -29,12 +30,14 @@ export default function EditUserPage() {
   const router = useRouter();
   const params = useParams();
   const userId = params.id as string;
-
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [profileImage, setProfileImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Image preview states
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -61,11 +64,10 @@ export default function EditUserPage() {
       const result = await getUserByIdAction(userId);
       if (!result.success) {
         toast.error(result.message || "Failed to fetch user");
-        setTimeout(() => {
-          router.push("/admin/users");
-        }, 1500);
+        router.push("/admin/users");
         return;
       }
+
       setUser(result.data);
       setForm({
         fullName: result.data.fullName || "",
@@ -81,16 +83,9 @@ export default function EditUserPage() {
         address: result.data.address || "",
         parentContact: result.data.parentContact || "",
       });
-      if (result.data.profileImage) {
-        setPreviewUrl(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}${result.data.profileImage}`,
-        );
-      }
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch user");
-      setTimeout(() => {
-        router.push("/admin/users");
-      }, 1500);
+      router.push("/admin/users");
     } finally {
       setIsLoading(false);
     }
@@ -102,28 +97,80 @@ export default function EditUserPage() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageClick = () => fileInputRef.current?.click();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setProfileImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
     }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Store the file for later upload
+    setSelectedFile(file);
   };
 
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
 
+      // Validation
       if (!form.fullName || !form.username || !form.email || !form.phone) {
         toast.error("Please fill in all required fields");
         return;
       }
 
-      const result = await updateUserAction(userId, form, profileImage);
+      // First, upload the image if a new one was selected
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("profileImage", selectedFile);
+
+        const imageResult = await uploadUserProfileImageAction(
+          userId,
+          formData,
+        );
+
+        if (!imageResult.success) {
+          toast.error(imageResult.message || "Failed to upload image");
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      // Then update the user data
+      const updateData: any = {
+        fullName: form.fullName,
+        username: form.username,
+        email: form.email,
+        phone: form.phone,
+        gender: form.gender,
+        role: form.role,
+        about: form.about,
+        address: form.address,
+        parentContact: form.parentContact,
+        classId: form.classId,
+        sectionId: form.sectionId,
+      };
+
+      // Only include password if it's been changed
+      if (form.password) {
+        updateData.password = form.password;
+      }
+
+      const result = await updateUserAction(userId, updateData);
 
       if (!result.success) {
         toast.error(result.message || "Failed to update user");
@@ -131,6 +178,11 @@ export default function EditUserPage() {
       }
 
       toast.success(result.message || "User updated successfully!");
+
+      // Clear preview and selected file
+      setPreviewImage(null);
+      setSelectedFile(null);
+
       setTimeout(() => {
         router.push("/admin/users");
       }, 1000);
@@ -162,6 +214,13 @@ export default function EditUserPage() {
 
   if (!user) return null;
 
+  const profileImageUrl = user.profileImage
+    ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}${user.profileImage}`
+    : null;
+
+  // Use preview image if available, otherwise use the profile image
+  const displayImage = previewImage || profileImageUrl;
+
   return (
     <div className="uf-page">
       <header className="uf-header">
@@ -182,7 +241,7 @@ export default function EditUserPage() {
               onClick={handleSubmit}
               disabled={isSaving}
             >
-              {isSaving ? "Saving..." : "Save Changes"}
+              {isSaving ? "Updating..." : "Update User"}
             </button>
           </div>
         </div>
@@ -198,17 +257,23 @@ export default function EditUserPage() {
             <label className="uf-label">Profile Image</label>
             <div className="uf-image-upload">
               <input
+                ref={fileInputRef}
                 type="file"
                 id="profileImage"
                 accept="image/*"
-                onChange={handleImageChange}
+                onChange={handleFileChange}
                 className="uf-image-input"
               />
-              <label htmlFor="profileImage" className="uf-image-label">
-                {previewUrl ? (
+              <label
+                htmlFor="profileImage"
+                className="uf-image-label"
+                onClick={handleImageClick}
+                style={{ cursor: "pointer" }}
+              >
+                {displayImage ? (
                   <img
-                    src={previewUrl}
-                    alt="Preview"
+                    src={displayImage}
+                    alt={user.fullName}
                     className="uf-image-preview"
                   />
                 ) : (
@@ -239,6 +304,7 @@ export default function EditUserPage() {
                 name="fullName"
                 value={form.fullName}
                 onChange={onChange}
+                placeholder="John Doe"
                 maxLength={50}
               />
             </div>
@@ -250,6 +316,7 @@ export default function EditUserPage() {
                 name="username"
                 value={form.username}
                 onChange={onChange}
+                placeholder="johndoe"
                 autoCapitalize="none"
                 autoComplete="username"
                 maxLength={20}
@@ -268,6 +335,7 @@ export default function EditUserPage() {
                 name="email"
                 value={form.email}
                 onChange={onChange}
+                placeholder="john@example.com"
                 maxLength={64}
               />
             </div>
@@ -279,6 +347,7 @@ export default function EditUserPage() {
                 name="phone"
                 value={form.phone}
                 onChange={onChange}
+                placeholder="+977 9800000000"
                 maxLength={10}
                 inputMode="numeric"
                 pattern="[0-9]*"
@@ -326,6 +395,7 @@ export default function EditUserPage() {
                 onChange={onChange}
               >
                 <option value="user">User</option>
+                <option value="teacher">Teacher</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
@@ -337,6 +407,7 @@ export default function EditUserPage() {
                 name="about"
                 value={form.about}
                 onChange={onChange}
+                placeholder="About this user"
                 maxLength={60}
               />
             </div>
@@ -348,6 +419,7 @@ export default function EditUserPage() {
                 name="classId"
                 value={form.classId}
                 onChange={onChange}
+                placeholder="class"
                 maxLength={20}
               />
             </div>
@@ -359,6 +431,7 @@ export default function EditUserPage() {
                 name="sectionId"
                 value={form.sectionId}
                 onChange={onChange}
+                placeholder="Section"
                 maxLength={20}
               />
             </div>
@@ -370,6 +443,7 @@ export default function EditUserPage() {
                 name="address"
                 value={form.address}
                 onChange={onChange}
+                placeholder="Kathmandu, Nepal"
                 maxLength={35}
               />
             </div>
@@ -381,6 +455,7 @@ export default function EditUserPage() {
                 name="parentContact"
                 value={form.parentContact}
                 onChange={onChange}
+                placeholder="+977 9800000001"
                 maxLength={10}
                 inputMode="numeric"
                 pattern="[0-9]*"
@@ -392,7 +467,9 @@ export default function EditUserPage() {
             </div>
           </div>
 
-          <div className="uf-required-note">* Required fields</div>
+          <div className="uf-required-note">
+            * Required fields | Leave password empty to keep current password
+          </div>
         </div>
       </main>
     </div>

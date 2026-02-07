@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProfileData } from "../../../lib/actions/profile-action";
 import toast from "react-hot-toast";
-import Navbar from "../_components/Navbar";
+import Navbar from "./Navbar";
 import "./dashboard.css";
 
 interface UserProfile {
@@ -26,6 +26,7 @@ interface MenuItem {
   path: string;
   bgColor: string;
   iconColor: string;
+  isActive?: boolean; // Flag to indicate if route is active
 }
 
 export default function Dashboard() {
@@ -55,6 +56,19 @@ export default function Dashboard() {
     }
   };
 
+  const handleMenuClick = (item: MenuItem) => {
+    if (item.isActive) {
+      // Navigate to the route for active items
+      router.push(item.path);
+    } else {
+      // Show coming soon toast for inactive items
+      toast("Feature coming soon!", {
+        icon: "🚀",
+        style: { background: "#3b82f6", color: "#fff" },
+      });
+    }
+  };
+
   const menuItems: MenuItem[] = [
     {
       id: "routine",
@@ -76,9 +90,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/routine",
+      path: "/admin/dashboard/routine",
       bgColor: "#FEF3C7",
       iconColor: "#F59E0B",
+      isActive: false,
     },
     {
       id: "assignment",
@@ -100,9 +115,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/assignment",
+      path: "/admin/dashboard/assignment",
       bgColor: "#DBEAFE",
       iconColor: "#3B82F6",
+      isActive: false,
     },
     {
       id: "exam",
@@ -124,9 +140,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/exam",
+      path: "/admin/dashboard/exam",
       bgColor: "#FEE2E2",
       iconColor: "#EF4444",
+      isActive: false,
     },
     {
       id: "calendar",
@@ -148,9 +165,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/calendar",
+      path: "/admin/dashboard/calendar",
       bgColor: "#E0E7FF",
       iconColor: "#6366F1",
+      isActive: false,
     },
     {
       id: "announcement",
@@ -172,14 +190,15 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/announcement",
+      path: "/admin/dashboard/announcement",
       bgColor: "#FFEDD5",
       iconColor: "#F97316",
+      isActive: false,
     },
     {
-      id: "library",
-      title: "Library",
-      description: "Browse library resources",
+      id: "user",
+      title: "User",
+      description: "Browse user resources",
       icon: (
         <svg
           width="28"
@@ -192,13 +211,14 @@ export default function Dashboard() {
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={2}
-            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
           />
         </svg>
       ),
-      path: "/dashboard/library",
+      path: "/admin/users",
       bgColor: "#D1FAE5",
       iconColor: "#10B981",
+      isActive: true,
     },
   ];
 
@@ -238,12 +258,7 @@ export default function Dashboard() {
             <button
               key={item.id}
               className="dashboard-menu-card"
-              onClick={() => {
-                toast("Feature coming soon!", {
-                  icon: "🚀",
-                  style: { background: "#3b82f6", color: "#fff" },
-                });
-              }}
+              onClick={() => handleMenuClick(item)}
             >
               <div
                 className="menu-card-icon"

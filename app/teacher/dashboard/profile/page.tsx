@@ -3,17 +3,16 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { getProfileData } from "./../../../lib/actions/profile-action";
+import { getProfileData } from "../../../../lib/actions/profile-action";
 import "./profile.css";
-import { handleLogout } from "./../../../lib/actions/auth-action";
-import book from "./../../../assets/images/books.png";
-import HamroPadhai from "./../../../assets/images/HamroPadhai.png";
+import { handleLogout } from "../../../../lib/actions/auth-action";
+import book from "./../../../../assets/images/books.png";
+import HamroPadhai from "./../../../../assets/images/HamroPadhai.png";
 import { startTransition } from "react";
 import toast from "react-hot-toast";
-import Navbar from "../_components/Navbar";
-import NotificationPopup from "./NotificationPopup";
+import Navbar from "../../_component/Navbar";
 
-interface UserProfile {
+interface TeacherProfile {
   _id: string;
   fullName: string;
   email: string;
@@ -22,11 +21,13 @@ interface UserProfile {
   gender: string;
   role: string;
   profileImage: string | null;
+  about?: string;
+  address?: string;
 }
 
-export default function ProfilePage() {
+export default function TeacherProfilePage() {
   const router = useRouter();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showImageModal, setShowImageModal] = useState(false);
 
@@ -70,12 +71,12 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="profile-page">
-        <header className="profile-page-header">
-          <div className="header-container">
+      <div className="teacher-profile-page">
+        <header className="teacher-profile-page-header">
+          <div className="teacher-header-container">
             <button
-              onClick={() => router.push("/dashboard")}
-              className="back-button"
+              onClick={() => router.push("/teacher/dashboard")}
+              className="teacher-back-button"
             >
               <svg
                 width="24"
@@ -91,17 +92,17 @@ export default function ProfilePage() {
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
-              <span className="back-text">Back to Dashboard</span>
+              <span className="teacher-back-text">Back to Dashboard</span>
             </button>
 
-            <div className="brand-section">
-              <div className="brand-logo">
+            <div className="teacher-brand-section">
+              <div className="teacher-brand-logo">
                 <Image src={book} alt="Logo" />
               </div>
               <Image src={HamroPadhai} alt="HamroPadhai" />
             </div>
 
-            <button className="notification-button">
+            <button className="teacher-notification-button">
               <svg
                 width="24"
                 height="24"
@@ -120,12 +121,12 @@ export default function ProfilePage() {
           </div>
         </header>
 
-        <main className="profile-content">
-          <div className="profile-card">
-            <div className="profile-banner"></div>
-            <div className="avatar-section">
-              <div className="avatar-wrapper">
-                <div className="profile-avatar-placeholder">
+        <main className="teacher-profile-content">
+          <div className="teacher-profile-card">
+            <div className="teacher-profile-banner"></div>
+            <div className="teacher-avatar-section">
+              <div className="teacher-avatar-wrapper">
+                <div className="teacher-profile-avatar-placeholder">
                   <svg
                     width="60"
                     height="60"
@@ -137,8 +138,8 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            <h2 className="profile-name">Loading...</h2>
-            <p className="profile-username">@...</p>
+            <h2 className="teacher-profile-name">Loading... | Teacher</h2>
+            <p className="teacher-profile-username">@...</p>
           </div>
         </main>
       </div>
@@ -152,13 +153,13 @@ export default function ProfilePage() {
     : null;
 
   return (
-    <div className="profile-page">
+    <div className="teacher-profile-page">
       {/* Header */}
-      <header className="profile-page-header">
-        <div className="header-container">
+      <header className="teacher-profile-page-header">
+        <div className="teacher-header-container">
           <button
-            onClick={() => router.push("/dashboard")}
-            className="back-button"
+            onClick={() => router.push("/teacher/dashboard")}
+            className="teacher-back-button"
           >
             <svg
               width="24"
@@ -174,17 +175,17 @@ export default function ProfilePage() {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            <span className="back-text">Back to Dashboard</span>
+            <span className="teacher-back-text">Back to Dashboard</span>
           </button>
 
-          <div className="brand-section">
-            <div className="brand-logo">
+          <div className="teacher-brand-section">
+            <div className="teacher-brand-logo">
               <Image src={book} alt="Logo" />
             </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 
-          <button className="notification-button">
+          <button className="teacher-notification-button">
             <svg
               width="24"
               height="24"
@@ -204,13 +205,13 @@ export default function ProfilePage() {
       </header>
 
       {/* Main Content - Mobile Layout */}
-      <main className="profile-content mobile-layout">
-        <div className="profile-card">
-          <div className="profile-banner"></div>
+      <main className="teacher-profile-content teacher-mobile-layout">
+        <div className="teacher-profile-card">
+          <div className="teacher-profile-banner"></div>
 
-          <div className="avatar-section">
+          <div className="teacher-avatar-section">
             <div
-              className="avatar-wrapper"
+              className="teacher-avatar-wrapper"
               onClick={() => profileImageUrl && setShowImageModal(true)}
               style={{ cursor: profileImageUrl ? "pointer" : "default" }}
             >
@@ -218,10 +219,10 @@ export default function ProfilePage() {
                 <img
                   src={profileImageUrl}
                   alt={profile.fullName}
-                  className="profile-avatar-img"
+                  className="teacher-profile-avatar-img"
                 />
               ) : (
-                <div className="profile-avatar-placeholder">
+                <div className="teacher-profile-avatar-placeholder">
                   <svg
                     width="60"
                     height="60"
@@ -235,12 +236,12 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <h2 className="profile-name">{profile.fullName}</h2>
-          <p className="profile-username">@{profile.username}</p>
+          <h2 className="teacher-profile-name">{profile.fullName} - Teacher</h2>
+          <p className="teacher-profile-username">@{profile.username}</p>
 
-          <div className="info-rows">
-            <div className="info-row">
-              <div className="info-row-icon info-icon-email">
+          <div className="teacher-info-rows">
+            <div className="teacher-info-row">
+              <div className="teacher-info-row-icon teacher-info-icon-email">
                 <svg
                   width="20"
                   height="20"
@@ -256,14 +257,14 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="info-row-text">
-                <span className="info-row-label">Email</span>
-                <span className="info-row-value">{profile.email}</span>
+              <div className="teacher-info-row-text">
+                <span className="teacher-info-row-label">Email</span>
+                <span className="teacher-info-row-value">{profile.email}</span>
               </div>
             </div>
 
-            <div className="info-row">
-              <div className="info-row-icon info-icon-phone">
+            <div className="teacher-info-row">
+              <div className="teacher-info-row-icon teacher-info-icon-phone">
                 <svg
                   width="20"
                   height="20"
@@ -279,14 +280,14 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="info-row-text">
-                <span className="info-row-label">Phone</span>
-                <span className="info-row-value">{profile.phone}</span>
+              <div className="teacher-info-row-text">
+                <span className="teacher-info-row-label">Phone</span>
+                <span className="teacher-info-row-value">{profile.phone}</span>
               </div>
             </div>
 
-            <div className="info-row">
-              <div className="info-row-icon info-icon-institution">
+            <div className="teacher-info-row">
+              <div className="teacher-info-row-icon teacher-info-icon-institution">
                 <svg
                   width="20"
                   height="20"
@@ -302,14 +303,14 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="info-row-text">
-                <span className="info-row-label">Institution</span>
-                <span className="info-row-value">HamroPadhai</span>
+              <div className="teacher-info-row-text">
+                <span className="teacher-info-row-label">Address</span>
+                <span className="teacher-info-row-value">HamroPadhai</span>
               </div>
             </div>
 
-            <div className="info-row">
-              <div className="info-row-icon info-icon-username">
+            <div className="teacher-info-row">
+              <div className="teacher-info-row-icon teacher-info-icon-username">
                 <svg
                   width="20"
                   height="20"
@@ -325,19 +326,46 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="info-row-text">
-                <span className="info-row-label">Username</span>
-                <span className="info-row-value">{profile.username}</span>
+              <div className="teacher-info-row-text">
+                <span className="teacher-info-row-label">Username</span>
+                <span className="teacher-info-row-value">
+                  {profile.username}
+                </span>
               </div>
             </div>
+
+            {/* <div className="teacher-info-row">
+              <div className="teacher-info-row-icon teacher-info-icon-role">
+                <svg
+                  width="20"
+                  height="20"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div className="teacher-info-row-text">
+                <span className="teacher-info-row-label">Role</span>
+                <span className="teacher-info-row-value">Teacher</span>
+              </div>
+            </div> */}
           </div>
 
-          <div className="action-buttons">
+          <div className="teacher-action-buttons">
             <button
-              className="action-btn"
-              onClick={() => router.push("/dashboard/profile/editdetail")}
+              className="teacher-action-btn"
+              onClick={() =>
+                router.push("/teacher/dashboard/profile/editdetail")
+              }
             >
-              <div className="action-btn-icon action-icon-blue">
+              <div className="teacher-action-btn-icon teacher-action-icon-blue">
                 <svg
                   width="22"
                   height="22"
@@ -349,16 +377,18 @@ export default function ProfilePage() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                   />
                 </svg>
               </div>
-              <div className="action-btn-text">
-                <span className="action-btn-title">Edit Details</span>
-                <span className="action-btn-sub">Edit your information</span>
+              <div className="teacher-action-btn-text">
+                <span className="teacher-action-btn-title">Edit Profile</span>
+                <span className="teacher-action-btn-sub">
+                  Update your information
+                </span>
               </div>
               <svg
-                className="action-btn-arrow"
+                className="teacher-action-btn-arrow"
                 width="20"
                 height="20"
                 fill="none"
@@ -375,7 +405,7 @@ export default function ProfilePage() {
             </button>
 
             <button
-              className="action-btn"
+              className="teacher-action-btn"
               onClick={() =>
                 toast("Feature coming soon!", {
                   icon: "🚀",
@@ -386,7 +416,7 @@ export default function ProfilePage() {
                 })
               }
             >
-              <div className="action-btn-icon action-icon-orange">
+              <div className="teacher-action-btn-icon teacher-action-icon-orange">
                 <svg
                   width="22"
                   height="22"
@@ -408,14 +438,14 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="action-btn-text">
-                <span className="action-btn-title">Settings</span>
-                <span className="action-btn-sub">
-                  Update password and details
+              <div className="teacher-action-btn-text">
+                <span className="teacher-action-btn-title">Settings</span>
+                <span className="teacher-action-btn-sub">
+                  Update password and preferences
                 </span>
               </div>
               <svg
-                className="action-btn-arrow"
+                className="teacher-action-btn-arrow"
                 width="20"
                 height="20"
                 fill="none"
@@ -432,7 +462,7 @@ export default function ProfilePage() {
             </button>
 
             <button
-              className="action-btn"
+              className="teacher-action-btn"
               onClick={() =>
                 toast("Feature coming soon!", {
                   icon: "🚀",
@@ -443,7 +473,7 @@ export default function ProfilePage() {
                 })
               }
             >
-              <div className="action-btn-icon action-icon-teal">
+              <div className="teacher-action-btn-icon teacher-action-icon-teal">
                 <svg
                   width="22"
                   height="22"
@@ -459,14 +489,14 @@ export default function ProfilePage() {
                   />
                 </svg>
               </div>
-              <div className="action-btn-text">
-                <span className="action-btn-title">Support</span>
-                <span className="action-btn-sub">
-                  Request here to get support
+              <div className="teacher-action-btn-text">
+                <span className="teacher-action-btn-title">Support</span>
+                <span className="teacher-action-btn-sub">
+                  Get help and support
                 </span>
               </div>
               <svg
-                className="action-btn-arrow"
+                className="teacher-action-btn-arrow"
                 width="20"
                 height="20"
                 fill="none"
@@ -484,7 +514,7 @@ export default function ProfilePage() {
           </div>
 
           <form action={onLogout}>
-            <button className="logout-button">
+            <button className="teacher-logout-button">
               <svg
                 width="20"
                 height="20"
@@ -503,28 +533,27 @@ export default function ProfilePage() {
             </button>
           </form>
         </div>
-
         <Navbar />
       </main>
 
       {/* Desktop Layout */}
-      <main className="profile-content desktop-layout">
-        <div className="profile-card-desktop">
+      <main className="teacher-profile-content teacher-desktop-layout">
+        <div className="teacher-profile-card-desktop">
           {/* Header Section */}
-          <div className="desktop-header-section">
-            <div className="profile-banner-desktop"></div>
-            <div className="desktop-profile-header">
-              <div className="desktop-avatar-wrapper">
+          <div className="teacher-desktop-header-section">
+            <div className="teacher-profile-banner-desktop"></div>
+            <div className="teacher-desktop-profile-header">
+              <div className="teacher-desktop-avatar-wrapper">
                 {profileImageUrl ? (
                   <img
                     src={profileImageUrl}
                     alt={profile.fullName}
-                    className="desktop-avatar-img"
+                    className="teacher-desktop-avatar-img"
                     onClick={() => setShowImageModal(true)}
                     style={{ cursor: "pointer" }}
                   />
                 ) : (
-                  <div className="desktop-avatar-placeholder">
+                  <div className="teacher-desktop-avatar-placeholder">
                     <svg
                       width="80"
                       height="80"
@@ -537,19 +566,23 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <div className="desktop-profile-info">
-                <h1 className="desktop-profile-name">{profile.fullName}</h1>
-                <p className="desktop-profile-username">@{profile.username}</p>
+              <div className="teacher-desktop-profile-info">
+                <h1 className="teacher-desktop-profile-name">
+                  {profile.fullName} - Teacher
+                </h1>
+                <p className="teacher-desktop-profile-username">
+                  @{profile.username}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Content Grid */}
-          <div className="desktop-content-grid">
+          <div className="teacher-desktop-content-grid">
             {/* Left Column - Info Cards */}
-            <div className="desktop-info-column">
-              <div className="desktop-info-card">
-                <div className="desktop-info-icon info-icon-email">
+            <div className="teacher-desktop-info-column">
+              <div className="teacher-desktop-info-card">
+                <div className="teacher-desktop-info-icon teacher-info-icon-email">
                   <svg
                     width="24"
                     height="24"
@@ -565,14 +598,16 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-info-text">
-                  <span className="desktop-info-label">Email</span>
-                  <span className="desktop-info-value">{profile.email}</span>
+                <div className="teacher-desktop-info-text">
+                  <span className="teacher-desktop-info-label">Email</span>
+                  <span className="teacher-desktop-info-value">
+                    {profile.email}
+                  </span>
                 </div>
               </div>
 
-              <div className="desktop-info-card">
-                <div className="desktop-info-icon info-icon-phone">
+              <div className="teacher-desktop-info-card">
+                <div className="teacher-desktop-info-icon teacher-info-icon-phone">
                   <svg
                     width="24"
                     height="24"
@@ -588,14 +623,16 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-info-text">
-                  <span className="desktop-info-label">Phone</span>
-                  <span className="desktop-info-value">{profile.phone}</span>
+                <div className="teacher-desktop-info-text">
+                  <span className="teacher-desktop-info-label">Phone</span>
+                  <span className="teacher-desktop-info-value">
+                    {profile.phone}
+                  </span>
                 </div>
               </div>
 
-              <div className="desktop-info-card">
-                <div className="desktop-info-icon info-icon-institution">
+              <div className="teacher-desktop-info-card">
+                <div className="teacher-desktop-info-icon teacher-info-icon-institution">
                   <svg
                     width="24"
                     height="24"
@@ -611,14 +648,18 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-info-text">
-                  <span className="desktop-info-label">Institution</span>
-                  <span className="desktop-info-value">HamroPadhai</span>
+                <div className="teacher-desktop-info-text">
+                  <span className="teacher-desktop-info-label">
+                    Institution
+                  </span>
+                  <span className="teacher-desktop-info-value">
+                    HamroPadhai
+                  </span>
                 </div>
               </div>
 
-              <div className="desktop-info-card">
-                <div className="desktop-info-icon info-icon-username">
+              <div className="teacher-desktop-info-card">
+                <div className="teacher-desktop-info-icon teacher-info-icon-username">
                   <svg
                     width="24"
                     height="24"
@@ -634,20 +675,24 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-info-text">
-                  <span className="desktop-info-label">Username</span>
-                  <span className="desktop-info-value">{profile.username}</span>
+                <div className="teacher-desktop-info-text">
+                  <span className="teacher-desktop-info-label">Username</span>
+                  <span className="teacher-desktop-info-value">
+                    {profile.username}
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Right Column - Action Buttons */}
-            <div className="desktop-actions-column">
+            <div className="teacher-desktop-actions-column">
               <button
-                className="desktop-action-btn"
-                onClick={() => router.push("/dashboard/profile/editdetail")}
+                className="teacher-desktop-action-btn"
+                onClick={() =>
+                  router.push("/teacher/dashboard/profile/editdetail")
+                }
               >
-                <div className="desktop-action-icon action-icon-blue">
+                <div className="teacher-desktop-action-icon teacher-action-icon-blue">
                   <svg
                     width="24"
                     height="24"
@@ -659,18 +704,20 @@ export default function ProfilePage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                     />
                   </svg>
                 </div>
-                <div className="desktop-action-text">
-                  <span className="desktop-action-title">Edit Details</span>
-                  <span className="desktop-action-sub">
-                    Edit your information
+                <div className="teacher-desktop-action-text">
+                  <span className="teacher-desktop-action-title">
+                    Edit Profile
+                  </span>
+                  <span className="teacher-desktop-action-sub">
+                    Update your information
                   </span>
                 </div>
                 <svg
-                  className="desktop-action-arrow"
+                  className="teacher-desktop-action-arrow"
                   width="20"
                   height="20"
                   fill="none"
@@ -687,7 +734,7 @@ export default function ProfilePage() {
               </button>
 
               <button
-                className="desktop-action-btn"
+                className="teacher-desktop-action-btn"
                 onClick={() =>
                   toast("Feature coming soon!", {
                     icon: "🚀",
@@ -698,7 +745,7 @@ export default function ProfilePage() {
                   })
                 }
               >
-                <div className="desktop-action-icon action-icon-orange">
+                <div className="teacher-desktop-action-icon teacher-action-icon-orange">
                   <svg
                     width="24"
                     height="24"
@@ -720,14 +767,14 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-action-text">
-                  <span className="desktop-action-title">Settings</span>
-                  <span className="desktop-action-sub">
-                    Update password and details
+                <div className="teacher-desktop-action-text">
+                  <span className="teacher-desktop-action-title">Settings</span>
+                  <span className="teacher-desktop-action-sub">
+                    Update password and preferences
                   </span>
                 </div>
                 <svg
-                  className="desktop-action-arrow"
+                  className="teacher-desktop-action-arrow"
                   width="20"
                   height="20"
                   fill="none"
@@ -744,7 +791,7 @@ export default function ProfilePage() {
               </button>
 
               <button
-                className="desktop-action-btn"
+                className="teacher-desktop-action-btn"
                 onClick={() =>
                   toast("Feature coming soon!", {
                     icon: "🚀",
@@ -755,7 +802,7 @@ export default function ProfilePage() {
                   })
                 }
               >
-                <div className="desktop-action-icon action-icon-teal">
+                <div className="teacher-desktop-action-icon teacher-action-icon-teal">
                   <svg
                     width="24"
                     height="24"
@@ -771,12 +818,14 @@ export default function ProfilePage() {
                     />
                   </svg>
                 </div>
-                <div className="desktop-action-text">
-                  <span className="desktop-action-title">Support</span>
-                  <span className="desktop-action-sub">Request support</span>
+                <div className="teacher-desktop-action-text">
+                  <span className="teacher-desktop-action-title">Support</span>
+                  <span className="teacher-desktop-action-sub">
+                    Get help and support
+                  </span>
                 </div>
                 <svg
-                  className="desktop-action-arrow"
+                  className="teacher-desktop-action-arrow"
                   width="20"
                   height="20"
                   fill="none"
@@ -792,8 +841,8 @@ export default function ProfilePage() {
                 </svg>
               </button>
 
-              <form action={onLogout} className="desktop-logout-form">
-                <button className="desktop-logout-button">
+              <form action={onLogout} className="teacher-desktop-logout-form">
+                <button className="teacher-desktop-logout-button">
                   <svg
                     width="20"
                     height="20"
@@ -818,9 +867,12 @@ export default function ProfilePage() {
 
       {/* Full Screen Image Modal */}
       {showImageModal && profileImageUrl && (
-        <div className="image-modal" onClick={() => setShowImageModal(false)}>
+        <div
+          className="teacher-image-modal"
+          onClick={() => setShowImageModal(false)}
+        >
           <button
-            className="modal-close-btn"
+            className="teacher-modal-close-btn"
             onClick={() => setShowImageModal(false)}
           >
             <svg
@@ -841,7 +893,7 @@ export default function ProfilePage() {
           <img
             src={profileImageUrl}
             alt="Profile Full Screen"
-            className="modal-image"
+            className="teacher-modal-image"
             onClick={(e) => e.stopPropagation()}
           />
         </div>

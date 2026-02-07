@@ -10,7 +10,7 @@ import book from "./../../../assets/images/books.png";
 import HamroPadhai from "./../../../assets/images/HamroPadhai.png";
 import { startTransition } from "react";
 import toast from "react-hot-toast";
-import Navbar from "../_components/Navbar";
+import Navbar from "./Navbar";
 import NotificationPopup from "./NotificationPopup";
 
 interface UserProfile {
@@ -74,7 +74,7 @@ export default function ProfilePage() {
         <header className="profile-page-header">
           <div className="header-container">
             <button
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/admin/dashboard")}
               className="back-button"
             >
               <svg
@@ -157,7 +157,7 @@ export default function ProfilePage() {
       <header className="profile-page-header">
         <div className="header-container">
           <button
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.push("/admin/dashboard")}
             className="back-button"
           >
             <svg
@@ -335,7 +335,7 @@ export default function ProfilePage() {
           <div className="action-buttons">
             <button
               className="action-btn"
-              onClick={() => router.push("/dashboard/profile/editdetail")}
+              onClick={() => router.push("/admin/dashboard/profile/editdetail")}
             >
               <div className="action-btn-icon action-icon-blue">
                 <svg
@@ -645,7 +645,9 @@ export default function ProfilePage() {
             <div className="desktop-actions-column">
               <button
                 className="desktop-action-btn"
-                onClick={() => router.push("/dashboard/profile/editdetail")}
+                onClick={() =>
+                  router.push("/admin/dashboard/profile/editdetail")
+                }
               >
                 <div className="desktop-action-icon action-icon-blue">
                   <svg

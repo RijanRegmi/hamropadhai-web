@@ -188,20 +188,19 @@ export async function createUserAction(
 export async function updateUserAction(
   userId: string,
   data: {
-    fullName: string;
-    username: string;
-    email: string;
-    phone: string;
+    fullName?: string;
+    username?: string;
+    email?: string;
+    phone?: string;
     password?: string;
-    gender: string;
-    role: string;
+    gender?: string;
+    role?: string;
     about?: string;
     classId?: string;
     sectionId?: string;
     address?: string;
     parentContact?: string;
-  },
-  profileImage: File | null
+  }
 ) {
   try {
     const cookieStore = await cookies();
@@ -214,32 +213,15 @@ export async function updateUserAction(
       };
     }
 
-    const formData = new FormData();
-    formData.append("fullName", data.fullName);
-    formData.append("username", data.username);
-    formData.append("email", data.email);
-    formData.append("phone", data.phone);
-    if (data.password) formData.append("password", data.password);
-    formData.append("gender", data.gender);
-    formData.append("role", data.role);
-    
-    // Always append these fields, even if empty
-    formData.append("about", data.about || "");
-    formData.append("classId", data.classId || "");
-    formData.append("sectionId", data.sectionId || "");
-    formData.append("address", data.address || "");
-    formData.append("parentContact", data.parentContact || "");
-    
-    if (profileImage) formData.append("profileImage", profileImage);
-
     const response = await fetch(
       `${API_URL}/api/admin/users/${userId}`,
       {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: formData,
+        body: JSON.stringify(data),
       }
     );
 
@@ -273,7 +255,58 @@ export async function updateUserAction(
 
     return { 
       success: true, 
-      message: `User "${data.fullName}" updated successfully!`,
+      message: "User updated successfully!",
+      data: result.data 
+    };
+  } catch (error: any) {
+    return { 
+      success: false, 
+      message: "Network error. Please check your connection and try again." 
+    };
+  }
+}
+
+/* =========================
+   UPLOAD USER PROFILE IMAGE (ADMIN)
+========================= */
+export async function uploadUserProfileImageAction(
+  userId: string,
+  formData: FormData
+) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return { 
+        success: false, 
+        message: "Authentication required. Please login again." 
+      };
+    }
+
+    const response = await fetch(
+      `${API_URL}/api/admin/users/${userId}/upload-image`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return {
+        success: false,
+        message: result.message || "Failed to upload image. Please try again.",
+      };
+    }
+
+    return { 
+      success: true, 
+      message: "Profile image uploaded successfully!",
       data: result.data 
     };
   } catch (error: any) {

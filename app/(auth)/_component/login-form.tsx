@@ -37,7 +37,9 @@ export default function LoginForm() {
 
       setTimeout(() => {
         if (response.data?.role === "admin") {
-          window.location.href = "/admin/users";
+          window.location.href = "/admin/dashboard";
+        } else if (response.data?.role === "teacher") {
+          window.location.href = "/teacher/dashboard";
         } else {
           window.location.href = "/dashboard";
         }

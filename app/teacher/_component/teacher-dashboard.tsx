@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getProfileData } from "../../../lib/actions/profile-action";
 import toast from "react-hot-toast";
-import Navbar from "../_components/Navbar";
+import Navbar from "./Navbar";
 import "./dashboard.css";
 
 interface UserProfile {
@@ -76,7 +76,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/routine",
+      path: "/teacher/dashboard/routine",
       bgColor: "#FEF3C7",
       iconColor: "#F59E0B",
     },
@@ -100,7 +100,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/assignment",
+      path: "/teacher/dashboard/assignment",
       bgColor: "#DBEAFE",
       iconColor: "#3B82F6",
     },
@@ -124,7 +124,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/exam",
+      path: "/teacher/dashboard/exam",
       bgColor: "#FEE2E2",
       iconColor: "#EF4444",
     },
@@ -148,7 +148,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/calendar",
+      path: "/teacher/dashboard/calendar",
       bgColor: "#E0E7FF",
       iconColor: "#6366F1",
     },
@@ -172,7 +172,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/announcement",
+      path: "/teacher/dashboard/announcement",
       bgColor: "#FFEDD5",
       iconColor: "#F97316",
     },
@@ -196,7 +196,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/library",
+      path: "/teacher/dashboard/library",
       bgColor: "#D1FAE5",
       iconColor: "#10B981",
     },

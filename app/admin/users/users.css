@@ -95,13 +95,36 @@
 /* ─── Top Section ──────────────────────────────────────────────────────── */
 .users-top {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
 }
 
-.users-top-left {
+.users-btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 20px;
+  background: #fff;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  color: #4b5563;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color:rgb(240, 64, 64);
+  color: white;
+}
+.users-btn-back:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+  background: #eef2ff;
+}
+
+.users-top-center {
   flex: 1;
+  text-align: center;
 }
 
 .users-title {
@@ -332,6 +355,11 @@
   color: #065f46;
 }
 
+.users-badge-teacher {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
 /* ─── Actions ──────────────────────────────────────────────────────────── */
 .users-actions {
   display: flex;
@@ -465,9 +493,20 @@
   
   .users-top {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .users-top-center {
+    text-align: left;
   }
   
+  .users-btn-back{
+    background-color:rgb(240, 64, 64);
+    color: white;
+    width: 30%;
+    justify-content: center;
+  }
+
   .users-btn-create {
     width: 100%;
     justify-content: center;

@@ -165,7 +165,27 @@ export default function UsersPage() {
         <div className="users-container">
           {/* Header Section */}
           <div className="users-top">
-            <div className="users-top-left">
+            <button
+              className="users-btn-back"
+              onClick={() => router.push("/admin/dashboard")}
+            >
+              <svg
+                width="20"
+                height="20"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back
+            </button>
+            <div className="users-top-center">
               <h1 className="users-title">User Management</h1>
               <p className="users-subtitle">Manage all users in the system</p>
             </div>

@@ -36,6 +36,15 @@ export default function CreateUserPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+
       setProfileImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -247,6 +256,7 @@ export default function CreateUserPage() {
                 onChange={onChange}
               >
                 <option value="user">User</option>
+                <option value="teacher">Teacher</option>
                 <option value="admin">Admin</option>
               </select>
             </div>
