@@ -220,6 +220,128 @@
   background-color: #fff;
 }
 
+/* ─── Multi-Select Section (For Teachers) ─────────────────────────────── */
+.uf-multi-select-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.uf-multi-select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.uf-label-multi {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.uf-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.uf-checkbox-card {
+  position: relative;
+  display: flex;
+  cursor: pointer;
+  user-select: none;
+}
+
+.uf-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.uf-checkbox-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.uf-checkbox-card:hover .uf-checkbox-content {
+  border-color: #c7d2fe;
+  background: #faf5ff;
+}
+
+.uf-checkbox-input:checked + .uf-checkbox-content {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.uf-checkbox-icon {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #fff;
+  transition: all 0.2s;
+}
+
+.uf-checkbox-input:checked ~ .uf-checkbox-content .uf-checkbox-icon {
+  background: #6366f1;
+  border-color: #6366f1;
+}
+
+.uf-checkbox-input:checked ~ .uf-checkbox-content .uf-checkbox-icon svg {
+  stroke: #fff;
+}
+
+.uf-checkbox-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.uf-checkbox-input:checked ~ .uf-checkbox-content .uf-checkbox-label {
+  color: #4338ca;
+  font-weight: 600;
+}
+
+/* ─── Info Box (For Admin) ─────────────────────────────────────────────── */
+.uf-info-box {
+  margin-top: 24px;
+  padding: 16px 18px;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #1e40af;
+}
+
+.uf-info-box svg {
+  flex-shrink: 0;
+  stroke: #3b82f6;
+}
+
+.uf-info-box span {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ─── Required Note ────────────────────────────────────────────────────── */
 .uf-required-note {
   margin-top: 24px;
   padding-top: 24px;
@@ -254,6 +376,12 @@
 }
 
 /* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .uf-checkbox-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
 @media (max-width: 640px) {
   .uf-card {
     padding: 28px 20px 32px;
@@ -266,5 +394,23 @@
   .uf-content {
     margin: 1rem auto;
     padding: 0 0.75rem;
+  }
+
+  .uf-checkbox-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .uf-header-inner {
+    padding: 0 1rem;
+  }
+
+  .uf-brand-title {
+    font-size: 16px;
+  }
+
+  .uf-btn-cancel,
+  .uf-btn-save {
+    padding: 8px 16px;
+    font-size: 13px;
   }
 }

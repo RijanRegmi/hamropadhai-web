@@ -1,0 +1,453 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   routines-list.css - Admin Routines List
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.rl-page {
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.rl-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.rl-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.rl-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rl-brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.rl-brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.rl-btn-create {
+  padding: 9px 24px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rl-btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Loading State ────────────────────────────────────────────────────── */
+.rl-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.rl-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: rl-spin 1s linear infinite;
+}
+
+@keyframes rl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rl-loading p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ─── Main Content ─────────────────────────────────────────────────────── */
+.rl-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.rl-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px 44px 44px;
+}
+
+.rl-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.rl-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.rl-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ─── Filters ──────────────────────────────────────────────────────────── */
+.rl-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.rl-filter-select {
+  padding: 10px 14px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 150px;
+}
+.rl-filter-select:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.sr-btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 95, 95);
+  border: 1.5px solid rgb(255, 95, 95);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sr-btn-back:hover {
+  border-color: red;
+  background-color: red;
+  color: #ffffff;
+}
+
+.rl-btn-clear-filters {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1.5px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rl-btn-clear-filters:hover {
+  background: #fef2f2;
+}
+
+/* ─── Routines Grid ────────────────────────────────────────────────────── */
+.rl-routines-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.rl-routine-card {
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px;
+  transition: all 0.2s;
+}
+.rl-routine-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.rl-routine-header {
+  margin-bottom: 16px;
+}
+
+.rl-routine-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.rl-routine-title h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.rl-status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.rl-status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+.rl-status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.rl-routine-year {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ─── Stats ────────────────────────────────────────────────────────────── */
+.rl-routine-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rl-stat {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.rl-stat-label {
+  display: block;
+  font-size: 11px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.rl-stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: #6366f1;
+}
+
+/* ─── Days Pills ───────────────────────────────────────────────────────── */
+.rl-routine-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.rl-day-pill {
+  padding: 4px 10px;
+  background: #eff6ff;
+  color: #1e40af;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.rl-day-pill.more {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* ─── Actions ──────────────────────────────────────────────────────────── */
+.rl-routine-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.rl-btn-view,
+.rl-btn-edit,
+.rl-btn-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1.5px solid;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rl-btn-view {
+  background: #fff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+.rl-btn-view:hover {
+  background: #eff6ff;
+}
+
+.rl-btn-edit {
+  background: #fff;
+  border-color: #10b981;
+  color: #10b981;
+}
+.rl-btn-edit:hover {
+  background: #f0fdf4;
+}
+
+.rl-btn-delete {
+  background: #fff;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.rl-btn-delete:hover {
+  background: #fef2f2;
+}
+
+/* ─── Footer ───────────────────────────────────────────────────────────── */
+.rl-routine-footer {
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.rl-routine-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ─── Empty State ──────────────────────────────────────────────────────── */
+.rl-empty-state {
+  padding: 80px 40px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.rl-empty-state svg {
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.rl-empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.rl-empty-state p {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0 0 24px;
+}
+
+.rl-btn-create-empty {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.rl-btn-create-empty:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rl-content {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+  
+    .sr-btn-back {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+  
+  .rl-card {
+    padding: 24px 20px;
+  }
+
+  .rl-routines-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rl-filters {
+    flex-direction: column;
+  }
+
+  .rl-filter-select {
+    min-width: 100%;
+  }
+
+  .rl-routine-actions {
+    grid-template-columns: 1fr;
+  }
+}

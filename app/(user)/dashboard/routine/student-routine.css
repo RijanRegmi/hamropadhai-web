@@ -1,0 +1,780 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   student-routine.css - Student Routine View (Color-Coded Days)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sr-page {
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.sr-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sr-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.sr-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.sr-brand-logo-img {
+  object-fit: contain;
+}
+
+.sr-btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 95, 95);
+  border: 1.5px solid rgb(255, 95, 95);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.sr-btn-back:hover {
+  border-color: red;
+  background-color: red;
+  color: #ffffff;
+}
+
+/* ─── Loading State ────────────────────────────────────────────────────── */
+.sr-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.sr-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: sr-spin 1s linear infinite;
+}
+
+@keyframes sr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sr-loading p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ─── Main Content ─────────────────────────────────────────────────────── */
+.sr-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.sr-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px 44px 44px;
+}
+
+.sr-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.sr-card-header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.sr-card-header-spacer {
+  width: 100px; /* Match button width approximately */
+}
+
+.sr-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.sr-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ─── Info Bar ─────────────────────────────────────────────────────────── */
+.sr-info-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 12px;
+}
+
+.sr-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sr-info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0369a1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sr-info-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0c4a6e;
+}
+
+.sr-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.sr-status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+}
+.sr-status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ─── Day Navigation (Mobile Only) ─────────────────────────────────────── */
+.sr-day-navigation {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+/* Today - Green Navigation */
+.sr-day-navigation.today {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+/* Tomorrow - Yellow Navigation */
+.sr-day-navigation.tomorrow {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+/* No Class - Red Navigation */
+.sr-day-navigation.no-class {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.sr-nav-btn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sr-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.sr-nav-btn:active {
+  transform: scale(0.95);
+}
+
+.sr-day-title-container {
+  flex: 1;
+  text-align: center;
+  color: #fff;
+}
+
+.sr-current-day-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.sr-today-indicator {
+  padding: 3px 12px;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sr-tomorrow-indicator {
+  padding: 3px 12px;
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sr-day-counter {
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* ─── Single Day View (Mobile Only) ────────────────────────────────────── */
+.sr-single-day-view {
+  display: none; /* Hidden on desktop */
+}
+
+.sr-day-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sr-periods-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.sr-periods-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ─── No Classes Card (Mobile) ─────────────────────────────────────────── */
+.sr-no-classes-card {
+  padding: 48px 24px;
+  text-align: center;
+  background: #fee2e2;
+  border: 2px solid #fca5a5;
+  border-radius: 14px;
+  color: #991b1b;
+}
+
+.sr-no-classes-card.today {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.sr-no-classes-card.tomorrow {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.sr-no-classes-card svg {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.sr-no-classes-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.sr-no-classes-card p {
+  font-size: 14px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* ─── Desktop View (All Days Grid) ─────────────────────────────────────── */
+.sr-desktop-view {
+  display: block; /* Visible on desktop */
+}
+
+.sr-days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.sr-day-card {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 20px;
+  transition: all 0.3s;
+  min-height: 200px;
+}
+
+/* Today - GREEN THEME */
+.sr-day-card.today {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  transform: translateY(-2px);
+}
+
+/* Tomorrow - YELLOW THEME */
+.sr-day-card.tomorrow {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.15);
+  transform: translateY(-2px);
+}
+
+/* No Class - RED THEME */
+.sr-day-card.no-class {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2, #fee2e2);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.sr-day-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.sr-day-card.today:hover {
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.sr-day-card.tomorrow:hover {
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+}
+
+.sr-day-card.no-class:hover {
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.sr-day-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sr-day-card.today .sr-day-header {
+  border-bottom-color: #10b981;
+}
+
+.sr-day-card.tomorrow .sr-day-header {
+  border-bottom-color: #fbbf24;
+}
+
+.sr-day-card.no-class .sr-day-header {
+  border-bottom-color: #ef4444;
+}
+
+.sr-day-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sr-day-card.today .sr-day-title {
+  color: #065f46;
+}
+
+.sr-day-card.tomorrow .sr-day-title {
+  color: #92400e;
+}
+
+.sr-day-card.no-class .sr-day-title {
+  color: #991b1b;
+}
+
+.sr-today-badge {
+  padding: 3px 10px;
+  background: #10b981;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+.sr-tomorrow-badge {
+  padding: 3px 10px;
+  background: #fbbf24;
+  color: #78350f;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.3);
+}
+
+.sr-periods-count-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.sr-day-card.today .sr-periods-count-badge {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sr-day-card.tomorrow .sr-periods-count-badge {
+  background: #fde68a;
+  color: #92400e;
+}
+
+/* ─── No Classes (Desktop) ─────────────────────────────────────────────── */
+.sr-no-classes {
+  padding: 40px 20px;
+  text-align: center;
+  color: #ef4444;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.sr-no-classes svg {
+  margin-bottom: 12px;
+  opacity: 0.4;
+  stroke: #ef4444;
+}
+
+.sr-no-classes p {
+  margin: 0;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* ─── Periods List ─────────────────────────────────────────────────────── */
+.sr-periods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sr-period-card {
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.sr-period-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Today period cards */
+.sr-period-card.today {
+  border-color: #6ee7b7;
+  background: #fff;
+}
+
+.sr-period-card.today:hover {
+  border-color: #10b981;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+}
+
+/* Tomorrow period cards */
+.sr-period-card.tomorrow {
+  border-color: #fde68a;
+  background: #fff;
+}
+
+.sr-period-card.tomorrow:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.15);
+}
+
+.sr-period-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sr-period-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: #6366f1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sr-period-card.today .sr-period-number {
+  color: #10b981;
+}
+
+.sr-period-card.tomorrow .sr-period-number {
+  color: #f59e0b;
+}
+
+.sr-period-time {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 5px 12px;
+  border-radius: 6px;
+}
+
+.sr-period-card.today .sr-period-time {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sr-period-card.tomorrow .sr-period-time {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sr-period-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sr-period-subject {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.sr-period-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sr-period-teacher,
+.sr-period-room {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.sr-period-teacher svg,
+.sr-period-room svg {
+  flex-shrink: 0;
+  stroke: #9ca3af;
+}
+
+.sr-period-card.today .sr-period-teacher svg,
+.sr-period-card.today .sr-period-room svg {
+  stroke: #10b981;
+}
+
+.sr-period-card.tomorrow .sr-period-teacher svg,
+.sr-period-card.tomorrow .sr-period-room svg {
+  stroke: #f59e0b;
+}
+
+/* ─── Empty State ──────────────────────────────────────────────────────── */
+.sr-empty-state {
+  padding: 80px 40px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.sr-empty-state svg {
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.sr-empty-state h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.sr-empty-state p {
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.sr-empty-hint {
+  color: #9ca3af;
+  font-size: 13px !important;
+  font-style: italic;
+}
+
+/* ─── Responsive - Mobile View ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sr-header-inner {
+    padding: 0 1rem;
+  }
+
+  .sr-back-text {
+    display: none;
+  }
+
+  .sr-btn-back {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+
+  .sr-content {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .sr-card {
+    padding: 24px 20px 28px;
+    border-radius: 16px;
+  }
+
+  .sr-card-header {
+    margin-bottom: 20px;
+  }
+
+  .sr-card-title {
+    font-size: 20px;
+  }
+
+  .sr-info-bar {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  /* Show mobile navigation */
+  .sr-day-navigation {
+    display: flex;
+  }
+
+  /* Show mobile single day view */
+  .sr-single-day-view {
+    display: block;
+  }
+
+  /* Hide desktop grid view */
+  .sr-desktop-view {
+    display: none;
+  }
+
+  .sr-no-schedule {
+    padding: 40px 20px;
+  }
+
+  .sr-no-schedule h3 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sr-brand-title {
+    font-size: 16px;
+  }
+
+  .sr-brand-logo {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+
+  .sr-current-day-title {
+    font-size: 20px;
+  }
+
+  .sr-info-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .sr-period-card {
+    padding: 14px;
+  }
+
+  .sr-period-subject {
+    font-size: 15px;
+  }
+
+  .sr-period-teacher,
+  .sr-period-room {
+    font-size: 13px;
+  }
+
+  .sr-day-navigation {
+    padding: 16px;
+  }
+
+  .sr-nav-btn {
+    width: 40px;
+    height: 40px;
+  }
+}

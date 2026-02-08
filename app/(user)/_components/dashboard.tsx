@@ -239,10 +239,14 @@ export default function Dashboard() {
               key={item.id}
               className="dashboard-menu-card"
               onClick={() => {
-                toast("Feature coming soon!", {
-                  icon: "🚀",
-                  style: { background: "#3b82f6", color: "#fff" },
-                });
+                if (item.id === "routine") {
+                  router.push(item.path);
+                } else {
+                  toast("Feature coming soon!", {
+                    icon: "🚀",
+                    style: { background: "#3b82f6", color: "#fff" },
+                  });
+                }
               }}
             >
               <div

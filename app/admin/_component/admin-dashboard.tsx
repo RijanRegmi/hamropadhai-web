@@ -90,10 +90,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/admin/dashboard/routine",
+      path: "/admin/dashboard/routines",
       bgColor: "#FEF3C7",
       iconColor: "#F59E0B",
-      isActive: false,
+      isActive: true,
     },
     {
       id: "assignment",

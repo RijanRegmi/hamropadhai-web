@@ -26,6 +26,7 @@ interface MenuItem {
   path: string;
   bgColor: string;
   iconColor: string;
+  isActive?: boolean; // Flag to indicate if route is active
 }
 
 export default function Dashboard() {
@@ -79,6 +80,7 @@ export default function Dashboard() {
       path: "/teacher/dashboard/routine",
       bgColor: "#FEF3C7",
       iconColor: "#F59E0B",
+      isActive: true,
     },
     {
       id: "assignment",
@@ -239,10 +241,14 @@ export default function Dashboard() {
               key={item.id}
               className="dashboard-menu-card"
               onClick={() => {
-                toast("Feature coming soon!", {
-                  icon: "🚀",
-                  style: { background: "#3b82f6", color: "#fff" },
-                });
+                if (item.id === "routine") {
+                  router.push(item.path);
+                } else {
+                  toast("Feature coming soon!", {
+                    icon: "🚀",
+                    style: { background: "#3b82f6", color: "#fff" },
+                  });
+                }
               }}
             >
               <div

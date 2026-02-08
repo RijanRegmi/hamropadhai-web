@@ -20,17 +20,14 @@ export const setAuthToken = async (token: string, rememberMe: boolean = false) =
     cookieStore.set({
         name: 'auth_token',
         value: token,
-        httpOnly: true,
+        httpOnly: false,  // ✅ Must be false!
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: maxAge,
         path: '/',
     })
-}
-
-export const getAuthToken = async () => {
-    const cookieStore = await cookies();
-    return cookieStore.get('auth_token')?.value || null;
+    
+    console.log("✅ Auth token cookie set");
 }
 
 export const setUserData = async (userData: UserData, rememberMe: boolean = false) => {
@@ -41,12 +38,19 @@ export const setUserData = async (userData: UserData, rememberMe: boolean = fals
     cookieStore.set({
         name: 'user_data',
         value: JSON.stringify(userData),
-        httpOnly: true,
+        httpOnly: false,  // ✅ Must be false!
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         maxAge: maxAge,
         path: '/',
     })
+    
+    console.log("✅ User data cookie set");
+}
+
+export const getAuthToken = async () => {
+    const cookieStore = await cookies();
+    return cookieStore.get('auth_token')?.value || null;
 }
 
 export const getUserData = async (): Promise<UserData | null> => {
@@ -64,4 +68,5 @@ export const clearAuthCookies = async () => {
     const cookieStore = await cookies();
     cookieStore.delete('auth_token');
     cookieStore.delete('user_data');
+    console.log("✅ Cookies cleared");
 }

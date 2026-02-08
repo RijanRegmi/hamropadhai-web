@@ -10,6 +10,9 @@ import {
 import toast from "react-hot-toast";
 import "./user-form.css";
 
+const CLASSES = ["11", "12"];
+const SECTIONS = ["A", "B", "C", "D", "E"];
+
 interface User {
   _id: string;
   fullName: string;
@@ -54,6 +57,10 @@ export default function EditUserPage() {
     parentContact: "",
   });
 
+  // For teacher multi-select
+  const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
+
   useEffect(() => {
     fetchUser();
   }, [userId]);
@@ -69,6 +76,40 @@ export default function EditUserPage() {
       }
 
       setUser(result.data);
+
+      // Parse classId and sectionId based on role
+      let parsedClassId = "";
+      let parsedSectionId = "";
+      let parsedSelectedClasses: string[] = [];
+      let parsedSelectedSections: string[] = [];
+
+      if (result.data.role === "teacher") {
+        // For teachers, parse JSON arrays
+        try {
+          parsedSelectedClasses = result.data.classId
+            ? JSON.parse(result.data.classId)
+            : [];
+          parsedSelectedSections = result.data.sectionId
+            ? JSON.parse(result.data.sectionId)
+            : [];
+        } catch (e) {
+          // If not valid JSON, treat as single values
+          parsedSelectedClasses = result.data.classId
+            ? [result.data.classId]
+            : [];
+          parsedSelectedSections = result.data.sectionId
+            ? [result.data.sectionId]
+            : [];
+        }
+      } else {
+        // For students, use as single values
+        parsedClassId = result.data.classId || "";
+        parsedSectionId = result.data.sectionId || "";
+      }
+
+      setSelectedClasses(parsedSelectedClasses);
+      setSelectedSections(parsedSelectedSections);
+
       setForm({
         fullName: result.data.fullName || "",
         username: result.data.username || "",
@@ -78,8 +119,8 @@ export default function EditUserPage() {
         gender: result.data.gender || "male",
         role: result.data.role || "user",
         about: result.data.about || "",
-        classId: result.data.classId || "",
-        sectionId: result.data.sectionId || "",
+        classId: parsedClassId,
+        sectionId: parsedSectionId,
         address: result.data.address || "",
         parentContact: result.data.parentContact || "",
       });
@@ -94,7 +135,27 @@ export default function EditUserPage() {
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    // Reset class/section selections when role changes
+    if (name === "role") {
+      setSelectedClasses([]);
+      setSelectedSections([]);
+      setForm((prev) => ({ ...prev, classId: "", sectionId: "" }));
+    }
+  };
+
+  const toggleClass = (cls: string) => {
+    setSelectedClasses((prev) =>
+      prev.includes(cls) ? prev.filter((c) => c !== cls) : [...prev, cls],
+    );
+  };
+
+  const toggleSection = (sec: string) => {
+    setSelectedSections((prev) =>
+      prev.includes(sec) ? prev.filter((s) => s !== sec) : [...prev, sec],
+    );
   };
 
   const handleImageClick = () => fileInputRef.current?.click();
@@ -133,6 +194,31 @@ export default function EditUserPage() {
         return;
       }
 
+      // Role-specific validation and data preparation
+      let finalClassId = "";
+      let finalSectionId = "";
+
+      if (form.role === "teacher") {
+        if (selectedClasses.length === 0 || selectedSections.length === 0) {
+          toast.error(
+            "Please select at least one class and section for teacher",
+          );
+          return;
+        }
+        // Store as JSON string for teachers
+        finalClassId = JSON.stringify(selectedClasses);
+        finalSectionId = JSON.stringify(selectedSections);
+      } else if (form.role === "user") {
+        if (!form.classId || !form.sectionId) {
+          toast.error("Please select class and section for student");
+          return;
+        }
+        // Store as single values for students
+        finalClassId = form.classId;
+        finalSectionId = form.sectionId;
+      }
+      // Admin role: leave classId and sectionId empty
+
       // First, upload the image if a new one was selected
       if (selectedFile) {
         const formData = new FormData();
@@ -161,8 +247,8 @@ export default function EditUserPage() {
         about: form.about,
         address: form.address,
         parentContact: form.parentContact,
-        classId: form.classId,
-        sectionId: form.sectionId,
+        classId: finalClassId,
+        sectionId: finalSectionId,
       };
 
       // Only include password if it's been changed
@@ -394,7 +480,7 @@ export default function EditUserPage() {
                 value={form.role}
                 onChange={onChange}
               >
-                <option value="user">User</option>
+                <option value="user">Student</option>
                 <option value="teacher">Teacher</option>
                 <option value="admin">Admin</option>
               </select>
@@ -411,31 +497,143 @@ export default function EditUserPage() {
                 maxLength={60}
               />
             </div>
+          </div>
 
-            <div className="uf-field">
-              <label className="uf-label">Class</label>
-              <input
-                className="uf-input"
-                name="classId"
-                value={form.classId}
-                onChange={onChange}
-                placeholder="class"
-                maxLength={20}
-              />
+          {/* Class and Section Selection - Role-based */}
+          {form.role === "teacher" && (
+            <div className="uf-multi-select-section">
+              <div className="uf-multi-select-group">
+                <label className="uf-label uf-label-multi">
+                  Classes (Select one or more) *
+                </label>
+                <div className="uf-checkbox-grid">
+                  {CLASSES.map((cls) => (
+                    <label key={cls} className="uf-checkbox-card">
+                      <input
+                        type="checkbox"
+                        checked={selectedClasses.includes(cls)}
+                        onChange={() => toggleClass(cls)}
+                        className="uf-checkbox-input"
+                      />
+                      <div className="uf-checkbox-content">
+                        <div className="uf-checkbox-icon">
+                          {selectedClasses.includes(cls) && (
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="uf-checkbox-label">Class {cls}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="uf-multi-select-group">
+                <label className="uf-label uf-label-multi">
+                  Sections (Select one or more) *
+                </label>
+                <div className="uf-checkbox-grid">
+                  {SECTIONS.map((sec) => (
+                    <label key={sec} className="uf-checkbox-card">
+                      <input
+                        type="checkbox"
+                        checked={selectedSections.includes(sec)}
+                        onChange={() => toggleSection(sec)}
+                        className="uf-checkbox-input"
+                      />
+                      <div className="uf-checkbox-content">
+                        <div className="uf-checkbox-icon">
+                          {selectedSections.includes(sec) && (
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span className="uf-checkbox-label">Section {sec}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
+          )}
 
-            <div className="uf-field">
-              <label className="uf-label">Section</label>
-              <input
-                className="uf-input"
-                name="sectionId"
-                value={form.sectionId}
-                onChange={onChange}
-                placeholder="Section"
-                maxLength={20}
-              />
+          {form.role === "user" && (
+            <div className="uf-form-grid" style={{ marginTop: "24px" }}>
+              <div className="uf-field">
+                <label className="uf-label">Class *</label>
+                <select
+                  className="uf-input uf-select"
+                  name="classId"
+                  value={form.classId}
+                  onChange={onChange}
+                >
+                  <option value="">Select Class</option>
+                  {CLASSES.map((cls) => (
+                    <option key={cls} value={cls}>
+                      Class {cls}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="uf-field">
+                <label className="uf-label">Section *</label>
+                <select
+                  className="uf-input uf-select"
+                  name="sectionId"
+                  value={form.sectionId}
+                  onChange={onChange}
+                >
+                  <option value="">Select Section</option>
+                  {SECTIONS.map((sec) => (
+                    <option key={sec} value={sec}>
+                      Section {sec}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
+          )}
 
+          {form.role === "admin" && (
+            <div className="uf-info-box">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+              </svg>
+              <span>Admin users don't require class or section assignment</span>
+            </div>
+          )}
+
+          <div
+            className="uf-form-grid"
+            style={{ marginTop: form.role === "admin" ? "24px" : "0" }}
+          >
             <div className="uf-field">
               <label className="uf-label">Address</label>
               <input

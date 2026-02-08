@@ -6,6 +6,52 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 /* =========================
+   HELPER FUNCTION
+========================= */
+// Helper to check if teacher teaches a class/section
+function teacherTeachesClassSection(teacher: any, targetClassId: string, targetSectionId: string): boolean {
+  if (!teacher.classId || !teacher.sectionId) return false;
+
+  try {
+    // Parse classId (might be array string like '["11","12"]' or simple string like "11")
+    let teacherClasses: string[] = [];
+    if (teacher.classId.startsWith('[')) {
+      teacherClasses = JSON.parse(teacher.classId);
+    } else {
+      teacherClasses = [teacher.classId];
+    }
+
+    // Parse sectionId
+    let teacherSections: string[] = [];
+    if (teacher.sectionId.startsWith('[')) {
+      teacherSections = JSON.parse(teacher.sectionId);
+    } else {
+      teacherSections = [teacher.sectionId];
+    }
+
+    // Check if arrays contain the target values
+    const teachesClass = teacherClasses.includes(targetClassId);
+    const teachesSection = teacherSections.includes(targetSectionId);
+
+    console.log('Teacher filter check:', {
+      teacherName: teacher.fullName,
+      teacherClasses,
+      teacherSections,
+      targetClassId,
+      targetSectionId,
+      teachesClass,
+      teachesSection,
+      matches: teachesClass && teachesSection
+    });
+
+    return teachesClass && teachesSection;
+  } catch (error) {
+    console.error('Error parsing teacher class/section:', error);
+    return false;
+  }
+}
+
+/* =========================
    GET ALL USERS
 ========================= */
 export async function getAllUsersAction() {
@@ -26,9 +72,21 @@ export async function getAllUsersAction() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      cache: "no-store", // Ensure fresh data
     });
 
     const result = await response.json();
+
+    console.log("getAllUsersAction response:", {
+      status: response.status,
+      success: result.success,
+      dataCount: result.data?.length,
+      teachers: result.data?.filter((u: any) => u.role === 'teacher').map((t: any) => ({
+        name: t.fullName,
+        classId: t.classId,
+        sectionId: t.sectionId
+      }))
+    });
 
     if (!response.ok || !result.success) {
       return {
@@ -39,6 +97,65 @@ export async function getAllUsersAction() {
 
     return { success: true, data: result.data };
   } catch (error: any) {
+    console.error("getAllUsersAction error:", error);
+    return { 
+      success: false, 
+      message: "Network error. Please check your connection and try again." 
+    };
+  }
+}
+
+/* =========================
+   GET FILTERED TEACHERS
+   NEW: This filters teachers on the server side
+========================= */
+export async function getFilteredTeachersAction(classId: string, sectionId: string) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return { 
+        success: false, 
+        message: "Authentication required. Please login again." 
+      };
+    }
+
+    const response = await fetch(`${API_URL}/api/admin/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return {
+        success: false,
+        message: result.message || "Unable to load teachers.",
+      };
+    }
+
+    // Filter teachers
+    const allTeachers = result.data.filter((user: any) => user.role === "teacher");
+    const filteredTeachers = allTeachers.filter((teacher: any) => 
+      teacherTeachesClassSection(teacher, classId, sectionId)
+    );
+
+    console.log('Filtered teachers:', {
+      classId,
+      sectionId,
+      totalTeachers: allTeachers.length,
+      filteredCount: filteredTeachers.length,
+      filtered: filteredTeachers.map((t: any) => t.fullName)
+    });
+
+    return { success: true, data: filteredTeachers };
+  } catch (error: any) {
+    console.error("getFilteredTeachersAction error:", error);
     return { 
       success: false, 
       message: "Network error. Please check your connection and try again." 
@@ -69,6 +186,7 @@ export async function getUserByIdAction(userId: string) {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        cache: "no-store",
       }
     );
 
@@ -139,6 +257,13 @@ export async function createUserAction(
     
     if (profileImage) formData.append("profileImage", profileImage);
 
+    console.log("Creating user with data:", {
+      fullName: data.fullName,
+      role: data.role,
+      classId: data.classId,
+      sectionId: data.sectionId,
+    });
+
     const response = await fetch(`${API_URL}/api/admin/users`, {
       method: "POST",
       headers: {
@@ -149,8 +274,13 @@ export async function createUserAction(
 
     const result = await response.json();
 
+    console.log("Create user response:", {
+      status: response.status,
+      success: result.success,
+      data: result.data,
+    });
+
     if (!response.ok || !result.success) {
-      // Handle specific error cases
       if (response.status === 409) {
         return {
           success: false,
@@ -175,6 +305,7 @@ export async function createUserAction(
       data: result.data 
     };
   } catch (error: any) {
+    console.error("Create user error:", error);
     return { 
       success: false, 
       message: "Network error. Please check your connection and try again." 
@@ -213,6 +344,12 @@ export async function updateUserAction(
       };
     }
 
+    console.log("Updating user with data:", {
+      userId,
+      classId: data.classId,
+      sectionId: data.sectionId,
+    });
+
     const response = await fetch(
       `${API_URL}/api/admin/users/${userId}`,
       {
@@ -227,8 +364,12 @@ export async function updateUserAction(
 
     const result = await response.json();
 
+    console.log("Update user response:", {
+      status: response.status,
+      success: result.success,
+    });
+
     if (!response.ok || !result.success) {
-      // Handle specific error cases
       if (response.status === 404) {
         return {
           success: false,
@@ -259,6 +400,7 @@ export async function updateUserAction(
       data: result.data 
     };
   } catch (error: any) {
+    console.error("Update user error:", error);
     return { 
       success: false, 
       message: "Network error. Please check your connection and try again." 
@@ -346,7 +488,6 @@ export async function deleteUserAction(userId: string) {
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      // Handle specific error cases
       if (response.status === 404) {
         return {
           success: false,
