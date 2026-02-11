@@ -59,6 +59,42 @@
   object-fit: cover;
 }
 
+
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 74, 74);
+  border: 1.5px solid rgb(255, 84, 84);
+  border-radius: 8px;
+  color: rgb(247, 247, 247);  
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  border-color: rgb(255, 230, 230);
+  background-color: rgb(255, 16, 16);
+  color: #ffffff;
+}
+
+/* ─── Responsive - Mobile View ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .back-btn-text {
+    display: none;
+  }
+
+  .back-btn {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+
 /* ─── main / card ────────────────────────────────────────────────────────── */
 .teacher-ed-content {
   flex: 1;

@@ -10,7 +10,6 @@ import {
 } from "../../../../../lib/actions/profile-action";
 
 import "./editdetail.css";
-import book from "./../../../../../assets/images/books.png";
 import HamroPadhai from "./../../../../../assets/images/HamroPadhai.png";
 
 import Image from "next/image";
@@ -160,9 +159,6 @@ export default function TeacherEditDetailPage() {
         <header className="teacher-ed-header">
           <div className="teacher-ed-header-inner">
             <div className="teacher-ed-brand">
-              <div className="teacher-ed-brand-logo">
-                <Image src={book} alt="Logo" />
-              </div>
               <Image src={HamroPadhai} alt="HamroPadhai" />
             </div>
           </div>
@@ -189,9 +185,6 @@ export default function TeacherEditDetailPage() {
       <header className="teacher-ed-header">
         <div className="teacher-ed-header-inner">
           <div className="teacher-ed-brand">
-            <div className="teacher-ed-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
         </div>
@@ -199,6 +192,22 @@ export default function TeacherEditDetailPage() {
 
       <main className="teacher-ed-content">
         <div className="teacher-ed-card">
+          <button
+            className={`back-btn`}
+            onClick={() => router.push(`/teacher/dashboard/profile/`)}
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="back-btn-text">Back</span>
+          </button>
           <h2 className="teacher-ed-card-title">Edit Profile</h2>
           <p className="teacher-ed-card-sub">
             Update your personal information below

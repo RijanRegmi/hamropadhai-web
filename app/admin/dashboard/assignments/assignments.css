@@ -1,0 +1,629 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   assignments.css - Admin Assignments Management
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.aa-page {
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.aa-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.aa-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.aa-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.aa-brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.aa-brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.aa-btn-create {
+  padding: 9px 24px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aa-btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Loading State ────────────────────────────────────────────────────── */
+.aa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.aa-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: aa-spin 1s linear infinite;
+}
+
+@keyframes aa-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.aa-loading p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ─── Main Content ─────────────────────────────────────────────────────── */
+.aa-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.aa-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px 44px 44px;
+}
+
+.aa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.aa-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px;
+}
+
+.aa-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.aa-btn-back {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 95, 95);
+  border: 1.5px solid rgb(255, 95, 95);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aa-btn-back:hover {
+  border-color: red;
+  background-color: red;
+  color: #ffffff;
+}
+
+/* ─── View Toggle ──────────────────────────────────────────────────────── */
+.aa-view-toggle {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 8px;
+  background: #f9fafb;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.aa-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.aa-toggle-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.aa-toggle-btn.active {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Info Banner (History Mode) ──────────────────────────────────────── */
+.aa-info-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #eff6ff;
+  border: 1.5px solid #93c5fd;
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+
+.aa-info-banner svg {
+  flex-shrink: 0;
+  color: #2563eb;
+  margin-top: 2px;
+}
+
+.aa-info-banner div {
+  flex: 1;
+}
+
+.aa-info-banner strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 4px;
+}
+
+.aa-info-banner p {
+  font-size: 13px;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Filters ──────────────────────────────────────────────────────────── */
+.aa-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.aa-filter-select,
+.aa-filter-input {
+  padding: 10px 14px;
+  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  font-family: inherit;
+  transition: all 0.2s;
+  min-width: 150px;
+}
+
+.aa-filter-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.aa-filter-select:focus,
+.aa-filter-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.aa-btn-clear-filters {
+  padding: 10px 20px;
+  background: #fff;
+  border: 1.5px solid #ef4444;
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aa-btn-clear-filters:hover {
+  background: #fef2f2;
+}
+
+/* ─── Assignments Grid ────────────────────────────────────────────────── */
+.aa-assignments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+.aa-assignment-card {
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.aa-assignment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Time-based colors */
+.aa-assignment-card.overdue {
+  border-color: #fca5a5;
+  background: linear-gradient(135deg, #fff, #fef2f2);
+}
+
+.aa-assignment-card.today {
+  border-color: #fbbf24;
+  background: linear-gradient(135deg, #fff, #fffbeb);
+}
+
+.aa-assignment-card.tomorrow {
+  border-color: #60a5fa;
+  background: linear-gradient(135deg, #fff, #eff6ff);
+}
+
+.aa-assignment-card.soon {
+  border-color: #a78bfa;
+  background: linear-gradient(135deg, #fff, #f5f3ff);
+}
+
+/* ✅ NEW - History card styling */
+.aa-assignment-card.history {
+  border-color: #ff5555;
+  background: linear-gradient(135deg, #ffffff, #ffe7e7);
+  opacity: 0.95;
+}
+
+.aa-assignment-card.history:hover {
+  opacity: 1;
+  border-color: #ffcece;
+}
+
+.aa-assignment-header {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.aa-assignment-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.aa-assignment-title h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+  flex: 1;
+}
+
+.aa-time-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.aa-time-badge.overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.aa-time-badge.today {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.aa-time-badge.tomorrow {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.aa-time-badge.soon {
+  background: #ede9fe;
+  color: #5b21b6;
+}
+
+.aa-time-badge.ok {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* ✅ NEW - Archived badge styling */
+.aa-time-badge.archived {
+  background: #ffdfdf;
+  color: #ff4b4b;
+}
+
+.aa-assignment-subject {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6366f1;
+  margin: 0;
+}
+
+.aa-assignment-meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.aa-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aa-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.aa-meta-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.aa-assignment-description {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.aa-assignment-description p {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.aa-assignment-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.aa-btn-view,
+.aa-btn-edit,
+.aa-btn-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  border: 1.5px solid;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.aa-btn-view {
+  background: #fff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+.aa-btn-view:hover {
+  background: #eff6ff;
+}
+
+.aa-btn-edit {
+  background: #fff;
+  border-color: #10b981;
+  color: #10b981;
+}
+.aa-btn-edit:hover {
+  background: #f0fdf4;
+}
+
+.aa-btn-delete {
+  background: #fff;
+  border-color: #ef4444;
+  color: #ef4444;
+}
+.aa-btn-delete:hover {
+  background: #fef2f2;
+}
+
+/* ✅ NEW - Submission badge on delete button */
+.aa-submission-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+  border: 2px solid #fff;
+}
+
+.aa-assignment-footer {
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.aa-assignment-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ✅ NEW - Assignment status in footer */
+.aa-assignment-status {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6366f1;
+}
+
+/* ─── Empty State ──────────────────────────────────────────────────────── */
+.aa-empty-state {
+  padding: 80px 40px;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.aa-empty-state svg {
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.aa-empty-state h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.aa-empty-state p {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0 0 24px;
+}
+
+.aa-btn-create-empty {
+  padding: 12px 28px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.aa-btn-create-empty:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .aa-content {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+
+  .aa-card {
+    padding: 24px 20px;
+  }
+
+  .aa-assignments-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aa-filters {
+    flex-direction: column;
+  }
+
+  .aa-filter-select,
+  .aa-filter-input {
+    min-width: 100%;
+  }
+
+  .aa-assignment-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .aa-btn-back {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+
+  .aa-back-text {
+    display: none;
+  }
+
+  .aa-view-toggle {
+    width: 100%;
+  }
+
+  .aa-toggle-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .aa-assignment-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

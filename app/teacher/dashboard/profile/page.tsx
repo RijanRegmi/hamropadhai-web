@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { getProfileData } from "../../../../lib/actions/profile-action";
 import "./profile.css";
 import { handleLogout } from "../../../../lib/actions/auth-action";
-import book from "./../../../../assets/images/books.png";
 import HamroPadhai from "./../../../../assets/images/HamroPadhai.png";
 import { startTransition } from "react";
 import toast from "react-hot-toast";
@@ -96,9 +95,6 @@ export default function TeacherProfilePage() {
             </button>
 
             <div className="teacher-brand-section">
-              <div className="teacher-brand-logo">
-                <Image src={book} alt="Logo" />
-              </div>
               <Image src={HamroPadhai} alt="HamroPadhai" />
             </div>
 
@@ -179,9 +175,6 @@ export default function TeacherProfilePage() {
           </button>
 
           <div className="teacher-brand-section">
-            <div className="teacher-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 

@@ -115,10 +115,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/admin/dashboard/assignment",
+      path: "/admin/dashboard/assignments",
       bgColor: "#DBEAFE",
       iconColor: "#3B82F6",
-      isActive: false,
+      isActive: true,
     },
     {
       id: "exam",

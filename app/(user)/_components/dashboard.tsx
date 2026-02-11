@@ -26,6 +26,7 @@ interface MenuItem {
   path: string;
   bgColor: string;
   iconColor: string;
+  isActive?: boolean;
 }
 
 export default function Dashboard() {
@@ -100,9 +101,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/dashboard/assignment",
+      path: "/dashboard/assignments",
       bgColor: "#DBEAFE",
       iconColor: "#3B82F6",
+      isActive: true,
     },
     {
       id: "exam",
@@ -239,7 +241,7 @@ export default function Dashboard() {
               key={item.id}
               className="dashboard-menu-card"
               onClick={() => {
-                if (item.id === "routine") {
+                if (item.id === "routine" || item.id === "assignment") {
                   router.push(item.path);
                 } else {
                   toast("Feature coming soon!", {

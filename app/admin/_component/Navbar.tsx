@@ -7,7 +7,6 @@ import { handleLogout } from "../../../lib/actions/auth-action";
 import { getProfileData } from "../../../lib/actions/profile-action";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
-import book from "../../../assets/images/books.png";
 import HamroPadhai from "../../../assets/images/HamroPadhai.png";
 import NotificationPopup from "./NotificationPopup";
 import "./navbar.css";
@@ -82,9 +81,6 @@ export default function Navbar() {
             className="navbar-brand"
             onClick={() => router.push("/admin/dashboard")}
           >
-            <div className="navbar-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 
@@ -264,30 +260,10 @@ export default function Navbar() {
       {/* Mobile Top Header - Logo Only */}
       <header className="mobile-top-header">
         <div className="mobile-header-container">
-          <button className="mobile-back-btn" onClick={() => router.back()}>
-            <svg
-              width="24"
-              height="24"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
           <div
             className="mobile-header-brand"
             onClick={() => router.push("/admin/dashboard")}
           >
-            <div className="mobile-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 

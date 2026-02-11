@@ -8,6 +8,7 @@ import {
 } from "./../../../../lib/actions/routine-action";
 import toast from "react-hot-toast";
 import "./routines-list.css";
+import PageHeader from "./../../../_components/PageHeader";
 
 interface Routine {
   _id: string;
@@ -118,15 +119,12 @@ export default function AdminRoutinesPage() {
     <div className="rl-page">
       <header className="rl-header">
         <div className="rl-header-inner">
-          <div className="rl-brand">
-            <div className="rl-brand-logo">📚</div>
-            <span className="rl-brand-title">HamroPadhai Admin</span>
-          </div>
+          <PageHeader />
           <button
             className="rl-btn-create"
             onClick={() => router.push("/admin/dashboard/routines/create")}
           >
-            + Create New Routine
+            Create Routine
           </button>
         </div>
       </header>

@@ -1,0 +1,47 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   page-header.css - Reusable Page Header Component
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.page-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.page-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+}
+
+.page-header-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-header-brand-logo-img {
+  object-fit: contain;
+  width: 200px;
+}
+
+/* ─── Responsive - Mobile View ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-header-inner {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-header-brand-logo-img {
+    width: 200px;
+    height: auto;
+  }
+}

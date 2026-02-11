@@ -11,7 +11,8 @@ import {
   getFilteredTeachersAction,
 } from "../../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
-import "./../../create/routine.css";
+import "./routine-edit.css";
+import PageHeader from "./../../../../../_components/PageHeader";
 
 interface Teacher {
   _id: string;
@@ -50,16 +51,41 @@ const DAYS = [
 const CLASSES = ["11", "12"];
 const SECTIONS = ["A", "B", "C", "D", "E"];
 
+// Subject list matching the assignment page
+const SUBJECTS = [
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "English",
+  "Nepali",
+  "Computer Science",
+  "Accountancy",
+  "Economics",
+  "Business Studies",
+];
+
+const ROOMS = [
+  "101",
+  "102",
+  "103",
+  "104",
+  "105",
+  "201",
+  "202",
+  "203",
+  "204",
+  "205",
+];
+
 export default function EditRoutinePage() {
   const router = useRouter();
   const params = useParams();
 
-  // Log params to debug
   console.log("=== PARAMS DEBUG ===");
   console.log("Full params object:", params);
   console.log("params keys:", params ? Object.keys(params) : "null");
 
-  // Try multiple possible param names
   const routineId = (params?.id ||
     params?.routineId ||
     params?.["[id]"]) as string;
@@ -89,7 +115,6 @@ export default function EditRoutinePage() {
       console.error("❌ No routine ID found in params");
       console.error("params object:", JSON.stringify(params, null, 2));
       toast.error("Invalid routine ID");
-      // Don't redirect immediately, wait a moment for params to potentially load
       setTimeout(() => {
         if (!routineId) {
           router.push("/admin/dashboard/routines");
@@ -142,7 +167,6 @@ export default function EditRoutinePage() {
       setSectionId(routine.sectionId || "");
       setAcademicYear(routine.academicYear || "2024-2025");
 
-      // Convert entries to include isConfirmed flag
       const entriesWithConfirmed = (routine.entries || []).map(
         (entry: any) => ({
           day: entry.day,
@@ -154,7 +178,7 @@ export default function EditRoutinePage() {
             teacherId: period.teacherId || null,
             teacherName: period.teacherName || "",
             roomNumber: period.roomNumber || "",
-            isConfirmed: true, // Existing periods start as confirmed
+            isConfirmed: true,
           })),
         }),
       );
@@ -444,7 +468,6 @@ export default function EditRoutinePage() {
     }
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="rf-page">
@@ -463,17 +486,8 @@ export default function EditRoutinePage() {
     <div className="rf-page">
       <header className="rf-header">
         <div className="rf-header-inner">
-          <div className="rf-brand">
-            <div className="rf-brand-logo">📚</div>
-            <span className="rf-brand-title">HamroPadhai Admin</span>
-          </div>
+          <PageHeader />
           <div className="rf-header-actions">
-            <button
-              className="rf-btn-cancel"
-              onClick={() => router.push("/admin/dashboard/routines")}
-            >
-              Cancel
-            </button>
             <button
               className="rf-btn-save"
               onClick={handleSubmit}
@@ -487,6 +501,22 @@ export default function EditRoutinePage() {
 
       <main className="rf-content">
         <div className="rf-card">
+          <button
+            className={`back-btn`}
+            onClick={() => router.push(`/admin/dashboard/routines/`)}
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="back-btn-text">Back</span>
+          </button>
           <h2 className="rf-card-title">Edit Class Routine</h2>
           <p className="rf-card-sub">Update the routine details</p>
 
@@ -698,8 +728,8 @@ export default function EditRoutinePage() {
                                 />
                               </div>
 
-                              <input
-                                className="rf-input rf-input-sm"
+                              <select
+                                className="rf-input rf-input-sm rf-select"
                                 value={period.subject}
                                 onChange={(e) =>
                                   updatePeriod(
@@ -709,8 +739,14 @@ export default function EditRoutinePage() {
                                     e.target.value,
                                   )
                                 }
-                                placeholder="Subject *"
-                              />
+                              >
+                                <option value="">Select Subject *</option>
+                                {SUBJECTS.map((subject) => (
+                                  <option key={subject} value={subject}>
+                                    {subject}
+                                  </option>
+                                ))}
+                              </select>
 
                               <select
                                 className="rf-input rf-input-sm rf-select"
@@ -732,7 +768,7 @@ export default function EditRoutinePage() {
                                 ))}
                               </select>
 
-                              <input
+                              <select
                                 className="rf-input rf-input-sm"
                                 value={period.roomNumber}
                                 onChange={(e) =>
@@ -743,8 +779,14 @@ export default function EditRoutinePage() {
                                     e.target.value,
                                   )
                                 }
-                                placeholder="Room (optional)"
-                              />
+                              >
+                                <option value="">Select room *</option>
+                                {ROOMS.map((room) => (
+                                  <option key={room} value={room}>
+                                    {room}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
 
                             <div className="rf-period-confirm-section">

@@ -1,0 +1,42 @@
+.aa-grading-stats {
+          margin-bottom: 16px;
+          padding: 12px;
+          background: #f9fafb;
+          border-radius: 8px;
+        }
+
+        .aa-stat-bar {
+          margin-bottom: 8px;
+        }
+
+        .aa-stat-label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #6b7280;
+          display: block;
+          margin-bottom: 6px;
+        }
+
+        .aa-progress-bar {
+          height: 8px;
+          background: #e5e7eb;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .aa-progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #10b981, #059669);
+          transition: width 0.3s ease;
+        }
+
+        .aa-pending-badge {
+          display: inline-block;
+          padding: 4px 10px;
+          background: #fef3c7;
+          color: #92400e;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+        }

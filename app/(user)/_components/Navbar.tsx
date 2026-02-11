@@ -11,6 +11,7 @@ import book from "../../../assets/images/books.png";
 import HamroPadhai from "../../../assets/images/HamroPadhai.png";
 import NotificationPopup from "./NotificationPopup";
 import "./navbar.css";
+import PageHeader from "./../../_components/PageHeader";
 
 interface UserProfile {
   _id: string;
@@ -82,9 +83,6 @@ export default function Navbar() {
             className="navbar-brand"
             onClick={() => router.push("/dashboard")}
           >
-            <div className="navbar-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 
@@ -285,9 +283,6 @@ export default function Navbar() {
             className="mobile-header-brand"
             onClick={() => router.push("/dashboard")}
           >
-            <div className="mobile-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 

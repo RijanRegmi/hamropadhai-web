@@ -10,6 +10,7 @@ import {
 } from "../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
 import "./routine.css";
+import HamroPadhai from "./../../../../../assets/images/HamroPadhai.png";
 
 interface Teacher {
   _id: string;
@@ -27,7 +28,7 @@ interface Period {
   teacherId: string | null;
   teacherName: string;
   roomNumber: string;
-  isConfirmed: boolean; // NEW: Track if period is confirmed
+  isConfirmed: boolean;
 }
 
 interface DayEntry {
@@ -48,6 +49,33 @@ const DAYS = [
 const CLASSES = ["11", "12"];
 const SECTIONS = ["A", "B", "C", "D", "E"];
 
+// Subject list matching the assignment page
+const SUBJECTS = [
+  "Mathematics",
+  "Physics",
+  "Chemistry",
+  "Biology",
+  "English",
+  "Nepali",
+  "Computer Science",
+  "Accountancy",
+  "Economics",
+  "Business Studies",
+];
+
+const ROOMS = [
+  "101",
+  "102",
+  "103",
+  "104",
+  "105",
+  "201",
+  "202",
+  "203",
+  "204",
+  "205",
+];
+
 export default function CreateRoutinePage() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
@@ -67,7 +95,6 @@ export default function CreateRoutinePage() {
     fetchTeachers();
   }, []);
 
-  // Fetch filtered teachers when class/section is confirmed
   useEffect(() => {
     if (classId && sectionId && isClassSectionConfirmed) {
       fetchFilteredTeachers();
@@ -184,7 +211,7 @@ export default function CreateRoutinePage() {
                 teacherId: null,
                 teacherName: "",
                 roomNumber: "",
-                isConfirmed: false, // NEW: Period starts unconfirmed
+                isConfirmed: false,
               },
             ],
           };
@@ -199,7 +226,6 @@ export default function CreateRoutinePage() {
       entries.map((entry) => {
         if (entry.day === day) {
           const newPeriods = entry.periods.filter((_, i) => i !== periodIndex);
-          // Renumber periods
           return {
             ...entry,
             periods: newPeriods.map((p, i) => ({ ...p, periodNumber: i + 1 })),
@@ -223,7 +249,6 @@ export default function CreateRoutinePage() {
             ...entry,
             periods: entry.periods.map((period, i) => {
               if (i === periodIndex) {
-                // If teacher is selected, update teacherName
                 if (field === "teacherId") {
                   const teacher = filteredTeachers.find((t) => t._id === value);
                   return {
@@ -243,14 +268,12 @@ export default function CreateRoutinePage() {
     );
   };
 
-  // NEW: Confirm period function
   const confirmPeriod = (day: string, periodIndex: number) => {
     const entry = entries.find((e) => e.day === day);
     if (!entry) return;
 
     const period = entry.periods[periodIndex];
 
-    // Validate period data
     if (
       !period.startTime ||
       !period.endTime ||
@@ -281,7 +304,6 @@ export default function CreateRoutinePage() {
     toast.success(`Period ${period.periodNumber} confirmed!`);
   };
 
-  // NEW: Edit period function
   const editPeriod = (day: string, periodIndex: number) => {
     setEntries(
       entries.map((entry) => {
@@ -305,7 +327,6 @@ export default function CreateRoutinePage() {
     try {
       setIsSaving(true);
 
-      // Validation
       if (!classId || !sectionId || !academicYear) {
         toast.error("Please fill in class, section, and academic year");
         return;
@@ -321,7 +342,6 @@ export default function CreateRoutinePage() {
         return;
       }
 
-      // Validate all periods
       for (const entry of entries) {
         if (entry.periods.length === 0) {
           toast.error(`Please add periods for ${entry.day}`);
@@ -350,7 +370,6 @@ export default function CreateRoutinePage() {
         }
       }
 
-      // Remove isConfirmed field before sending to backend
       const cleanedEntries = entries.map((entry) => ({
         day: entry.day,
         periods: entry.periods.map((period) => ({
@@ -402,8 +421,11 @@ export default function CreateRoutinePage() {
       <header className="rf-header">
         <div className="rf-header-inner">
           <div className="rf-brand">
-            <div className="rf-brand-logo">📚</div>
-            <span className="rf-brand-title">HamroPadhai Admin</span>
+            <img
+              src={HamroPadhai.src}
+              alt="HamroPadhai Logo"
+              className="rf-brand-title"
+            />
           </div>
           <div className="rf-header-actions">
             <button
@@ -430,7 +452,6 @@ export default function CreateRoutinePage() {
             Fill in the details to create a new routine
           </p>
 
-          {/* Basic Info */}
           <div className="rf-form-grid">
             <div className="rf-field">
               <label className="rf-label">Class *</label>
@@ -478,7 +499,6 @@ export default function CreateRoutinePage() {
             </div>
           </div>
 
-          {/* Confirmation Button */}
           <div className="rf-confirm-section">
             {!isClassSectionConfirmed ? (
               <button
@@ -505,7 +525,6 @@ export default function CreateRoutinePage() {
 
           {isClassSectionConfirmed && (
             <>
-              {/* Teacher Count Info */}
               <div className="rf-teacher-info">
                 <p>
                   {filteredTeachers.length} teacher(s) available for Class{" "}
@@ -518,7 +537,6 @@ export default function CreateRoutinePage() {
                 </p>
               </div>
 
-              {/* Add Day Section */}
               <div className="rf-add-day-section">
                 <h3 className="rf-section-title">Days & Periods</h3>
                 <div className="rf-add-day-box">
@@ -552,7 +570,6 @@ export default function CreateRoutinePage() {
                 </div>
               </div>
 
-              {/* Days List */}
               <div className="rf-days-list">
                 {entries.map((entry) => (
                   <div key={entry.day} className="rf-day-card">
@@ -676,8 +693,8 @@ export default function CreateRoutinePage() {
                                     />
                                   </div>
 
-                                  <input
-                                    className="rf-input rf-input-sm"
+                                  <select
+                                    className="rf-input rf-input-sm rf-select"
                                     value={period.subject}
                                     onChange={(e) =>
                                       updatePeriod(
@@ -687,8 +704,14 @@ export default function CreateRoutinePage() {
                                         e.target.value,
                                       )
                                     }
-                                    placeholder="Subject *"
-                                  />
+                                  >
+                                    <option value="">Select Subject *</option>
+                                    {SUBJECTS.map((subject) => (
+                                      <option key={subject} value={subject}>
+                                        {subject}
+                                      </option>
+                                    ))}
+                                  </select>
 
                                   <select
                                     className="rf-input rf-input-sm rf-select"
@@ -713,7 +736,7 @@ export default function CreateRoutinePage() {
                                     ))}
                                   </select>
 
-                                  <input
+                                  <select
                                     className="rf-input rf-input-sm"
                                     value={period.roomNumber}
                                     onChange={(e) =>
@@ -724,8 +747,14 @@ export default function CreateRoutinePage() {
                                         e.target.value,
                                       )
                                     }
-                                    placeholder="Room (optional)"
-                                  />
+                                  >
+                                    <option value="">Select room *</option>
+                                    {ROOMS.map((room) => (
+                                      <option key={room} value={room}>
+                                        {room}
+                                      </option>
+                                    ))}
+                                  </select>
                                 </div>
 
                                 <div className="rf-period-confirm-section">

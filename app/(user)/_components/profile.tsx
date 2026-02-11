@@ -95,9 +95,6 @@ export default function ProfilePage() {
             </button>
 
             <div className="brand-section">
-              <div className="brand-logo">
-                <Image src={book} alt="Logo" />
-              </div>
               <Image src={HamroPadhai} alt="HamroPadhai" />
             </div>
 
@@ -178,9 +175,6 @@ export default function ProfilePage() {
           </button>
 
           <div className="brand-section">
-            <div className="brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 

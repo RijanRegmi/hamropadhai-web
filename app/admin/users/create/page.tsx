@@ -30,9 +30,11 @@ export default function CreateUserPage() {
     parentContact: "",
   });
 
-  // For teacher multi-select
+  // For teacher: selected classes and sections per class
   const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
-  const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  const [selectedSectionsPerClass, setSelectedSectionsPerClass] = useState<
+    Record<string, string[]>
+  >({});
 
   const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -43,21 +45,40 @@ export default function CreateUserPage() {
     // Reset class/section selections when role changes
     if (name === "role") {
       setSelectedClasses([]);
-      setSelectedSections([]);
+      setSelectedSectionsPerClass({});
       setForm((prev) => ({ ...prev, classId: "", sectionId: "" }));
     }
   };
 
+  // Toggle class selection for teachers
   const toggleClass = (cls: string) => {
-    setSelectedClasses((prev) =>
-      prev.includes(cls) ? prev.filter((c) => c !== cls) : [...prev, cls],
-    );
+    if (selectedClasses.includes(cls)) {
+      // Remove class and its sections
+      setSelectedClasses(selectedClasses.filter((c) => c !== cls));
+      const newSections = { ...selectedSectionsPerClass };
+      delete newSections[cls];
+      setSelectedSectionsPerClass(newSections);
+    } else {
+      // Add class
+      setSelectedClasses([...selectedClasses, cls]);
+      setSelectedSectionsPerClass({ ...selectedSectionsPerClass, [cls]: [] });
+    }
   };
 
-  const toggleSection = (sec: string) => {
-    setSelectedSections((prev) =>
-      prev.includes(sec) ? prev.filter((s) => s !== sec) : [...prev, sec],
-    );
+  // Toggle section for a specific class
+  const toggleSection = (cls: string, section: string) => {
+    const currentSections = selectedSectionsPerClass[cls] || [];
+    if (currentSections.includes(section)) {
+      setSelectedSectionsPerClass({
+        ...selectedSectionsPerClass,
+        [cls]: currentSections.filter((s) => s !== section),
+      });
+    } else {
+      setSelectedSectionsPerClass({
+        ...selectedSectionsPerClass,
+        [cls]: [...currentSections, section],
+      });
+    }
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,15 +123,35 @@ export default function CreateUserPage() {
       let finalSectionId = "";
 
       if (form.role === "teacher") {
-        if (selectedClasses.length === 0 || selectedSections.length === 0) {
+        // Validate that at least one class is selected with sections
+        if (selectedClasses.length === 0) {
+          toast.error("Please select at least one class for teacher");
+          return;
+        }
+
+        // Check that all selected classes have at least one section
+        const classesWithoutSections = selectedClasses.filter(
+          (cls) =>
+            !selectedSectionsPerClass[cls] ||
+            selectedSectionsPerClass[cls].length === 0,
+        );
+
+        if (classesWithoutSections.length > 0) {
           toast.error(
-            "Please select at least one class and section for teacher",
+            `Please select at least one section for: Class ${classesWithoutSections.join(", Class ")}`,
           );
           return;
         }
-        // Store as JSON string for teachers
-        finalClassId = JSON.stringify(selectedClasses);
-        finalSectionId = JSON.stringify(selectedSections);
+
+        // Build class-section pairs array
+        const classSectionPairs = selectedClasses.map((cls) => ({
+          classId: cls,
+          sections: selectedSectionsPerClass[cls] || [],
+        }));
+
+        // Store as JSON string: [{"classId":"11","sections":["A","B"]},{"classId":"12","sections":["D","E"]}]
+        finalClassId = JSON.stringify(classSectionPairs);
+        finalSectionId = ""; // Not used for teachers
       } else if (form.role === "user") {
         if (!form.classId || !form.sectionId) {
           toast.error("Please select class and section for student");
@@ -332,6 +373,7 @@ export default function CreateUserPage() {
           {/* Class and Section Selection - Role-based */}
           {form.role === "teacher" && (
             <div className="uf-multi-select-section">
+              {/* Step 1: Select Classes */}
               <div className="uf-multi-select-group">
                 <label className="uf-label uf-label-multi">
                   Classes (Select one or more) *
@@ -367,40 +409,86 @@ export default function CreateUserPage() {
                 </div>
               </div>
 
-              <div className="uf-multi-select-group">
-                <label className="uf-label uf-label-multi">
-                  Sections (Select one or more) *
-                </label>
-                <div className="uf-checkbox-grid">
-                  {SECTIONS.map((sec) => (
-                    <label key={sec} className="uf-checkbox-card">
-                      <input
-                        type="checkbox"
-                        checked={selectedSections.includes(sec)}
-                        onChange={() => toggleSection(sec)}
-                        className="uf-checkbox-input"
-                      />
-                      <div className="uf-checkbox-content">
-                        <div className="uf-checkbox-icon">
-                          {selectedSections.includes(sec) && (
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="3"
-                            >
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </div>
-                        <span className="uf-checkbox-label">Section {sec}</span>
+              {/* Step 2: For each selected class, show sections */}
+              {selectedClasses.length > 0 && (
+                <div style={{ marginTop: "24px" }}>
+                  <label
+                    className="uf-label uf-label-multi"
+                    style={{ marginBottom: "16px", display: "block" }}
+                  >
+                    Sections for Selected Classes *
+                  </label>
+                  {selectedClasses.map((cls) => (
+                    <div
+                      key={cls}
+                      style={{
+                        border: "2px solid #e0e0e0",
+                        borderRadius: "8px",
+                        padding: "20px",
+                        marginBottom: "16px",
+                        background: "#f9f9f9",
+                      }}
+                    >
+                      <h4
+                        style={{
+                          margin: "0 0 12px 0",
+                          color: "#667eea",
+                          fontSize: "16px",
+                        }}
+                      >
+                        Class {cls} - Select Sections *
+                      </h4>
+                      <div className="uf-checkbox-grid">
+                        {SECTIONS.map((sec) => (
+                          <label key={sec} className="uf-checkbox-card">
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedSectionsPerClass[cls]?.includes(sec) ||
+                                false
+                              }
+                              onChange={() => toggleSection(cls, sec)}
+                              className="uf-checkbox-input"
+                            />
+                            <div className="uf-checkbox-content">
+                              <div className="uf-checkbox-icon">
+                                {selectedSectionsPerClass[cls]?.includes(
+                                  sec,
+                                ) && (
+                                  <svg
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="3"
+                                  >
+                                    <polyline points="20 6 9 17 4 12" />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="uf-checkbox-label">
+                                Section {sec}
+                              </span>
+                            </div>
+                          </label>
+                        ))}
                       </div>
-                    </label>
+                      {selectedSectionsPerClass[cls]?.length > 0 && (
+                        <p
+                          style={{
+                            marginTop: "12px",
+                            fontSize: "14px",
+                            color: "#666",
+                          }}
+                        >
+                          Selected: {selectedSectionsPerClass[cls].join(", ")}
+                        </p>
+                      )}
+                    </div>
                   ))}
                 </div>
-              </div>
+              )}
             </div>
           )}
 

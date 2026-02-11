@@ -10,7 +10,6 @@ import {
 } from "./../../../lib/actions/profile-action";
 
 import "./editdetail.css";
-import book from "./../../../assets/images/books.png";
 import HamroPadhai from "./../../../assets/images/HamroPadhai.png";
 import Image from "next/image";
 
@@ -161,9 +160,6 @@ export default function EditDetailPage() {
         <header className="ed-header">
           <div className="ed-header-inner">
             <div className="ed-brand">
-              <div className="ed-brand-logo">
-                <Image src={book} alt="Logo" />
-              </div>
               <Image src={HamroPadhai} alt="HamroPadhai" />
             </div>
           </div>
@@ -190,9 +186,6 @@ export default function EditDetailPage() {
       <header className="ed-header">
         <div className="ed-header-inner">
           <div className="ed-brand">
-            <div className="ed-brand-logo">
-              <Image src={book} alt="Logo" />
-            </div>
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
         </div>
@@ -200,6 +193,22 @@ export default function EditDetailPage() {
 
       <main className="ed-content">
         <div className="ed-card">
+          <button
+            className={`back-btn`}
+            onClick={() => router.push(`/dashboard/profile/`)}
+          >
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="back-btn-text">Back</span>
+          </button>
           <h2 className="ed-card-title">Edit Profile</h2>
           <p className="ed-card-sub">Update your personal information below</p>
 

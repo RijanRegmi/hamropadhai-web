@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getStudentRoutineAction } from "./../../../../lib/actions/routine-action";
 import toast from "react-hot-toast";
+import PageHeader from "./../../../_components/PageHeader";
+import BackButton from "./../../../_components/BackButton";
+
 import "./student-routine.css";
-import HamroPadhai from "./../../../../assets/images/HamroPadhai.png";
-import Image from "next/image";
 
 interface Period {
   periodNumber: number;
@@ -114,6 +115,7 @@ export default function StudentRoutinePage() {
   if (isLoading) {
     return (
       <div className="sr-page">
+        <PageHeader />
         <div className="sr-loading">
           <div className="sr-spinner"></div>
           <p>Loading your routine...</p>
@@ -125,35 +127,7 @@ export default function StudentRoutinePage() {
   if (!routine) {
     return (
       <div className="sr-page">
-        <header className="sr-header">
-          <div className="sr-header-inner">
-            <div className="sr-brand">
-              <Image
-                src={HamroPadhai}
-                alt="HamroPadhai Logo"
-                className="sr-brand-logo-img"
-                width={150}
-                height={40}
-              />
-            </div>
-            <button
-              className="sr-btn-back"
-              onClick={() => router.push("/dashboard")}
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="sr-back-text">Back</span>
-            </button>
-          </div>
-        </header>
+        <PageHeader />
         <main className="sr-content">
           <div className="sr-empty-state">
             <svg
@@ -172,52 +146,25 @@ export default function StudentRoutinePage() {
             <h2>No Routine Available</h2>
             <p>Your class routine has not been created yet.</p>
             <p className="sr-empty-hint">Please contact your administrator.</p>
+            <BackButton backUrl="/dashboard" />
           </div>
         </main>
       </div>
     );
   }
 
-  // Get current day for mobile view
   const currentDay = DAYS[currentDayIndex];
   const currentDayEntry = getDayEntry(currentDay);
   const currentDayType = getDayType(currentDay);
 
   return (
     <div className="sr-page">
-      <header className="sr-header">
-        <div className="sr-header-inner">
-          <div className="sr-brand">
-            <Image
-              src={HamroPadhai}
-              alt="HamroPadhai Logo"
-              className="sr-brand-logo-img"
-              width={150}
-              height={40}
-            />
-          </div>
-        </div>
-      </header>
+      <PageHeader />
 
       <main className="sr-content">
         <div className="sr-card">
           <div className="sr-card-header">
-            <button
-              className="sr-btn-back"
-              onClick={() => router.push("/dashboard")}
-            >
-              <svg
-                width="20"
-                height="20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path d="M15 19l-7-7 7-7" />
-              </svg>
-              <span className="sr-back-text">Back</span>
-            </button>
+            <BackButton backUrl="/dashboard" />
             <div className="sr-card-header-center">
               <h2 className="sr-card-title">My Class Routine</h2>
               <p className="sr-card-sub">View your weekly class schedule</p>

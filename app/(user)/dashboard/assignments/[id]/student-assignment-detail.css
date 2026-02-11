@@ -1,0 +1,842 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   student-assignment-detail.css - Student Assignment Detail Page
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sad-page {
+  min-height: 100vh;
+  background: #f0f4f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.sad-header {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.sad-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.sad-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sad-brand-logo {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.sad-brand-title {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sad-btn-back {
+  padding: 9px 22px;
+  background: transparent;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sad-btn-back:hover {
+  border-color: #9ca3af;
+  background: #f9fafb;
+  color: #111827;
+}
+
+
+
+
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 95, 95);
+  border: 1.5px solid rgb(255, 95, 95);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  border-color: red;
+  background-color: red;
+  color: #ffffff;
+}
+
+/* ─── Responsive - Mobile View ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .back-btn-text {
+    display: none;
+  }
+
+  .back-btn {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+
+/* ─── Loading ──────────────────────────────────────────────────────────── */
+.sad-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+}
+
+.sad-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: sad-spin 1s linear infinite;
+}
+
+@keyframes sad-spin {
+  to { transform: rotate(360deg); }
+}
+
+.sad-loading p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* ─── Content ──────────────────────────────────────────────────────────── */
+.sad-content {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sad-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+}
+
+.sad-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 20px;
+}
+
+/* ─── Assignment Info ──────────────────────────────────────────────────── */
+.sad-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.sad-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+.sad-subject {
+  font-size: 16px;
+  font-weight: 600;
+  color: #6366f1;
+  margin: 0;
+}
+
+.sad-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sad-status-badge {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sad-status-badge.overdue {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.sad-status-badge.today,
+.sad-status-badge.tomorrow {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.sad-status-badge.soon {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.sad-status-badge.ok {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sad-status-badge.submitted {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.sad-status-badge.graded {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.sad-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.sad-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sad-meta-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sad-meta-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.sad-meta-value.sad-marks {
+  font-size: 20px;
+  color: #10b981;
+}
+
+.sad-description,
+.sad-attachments {
+  margin-bottom: 20px;
+}
+
+.sad-description h3,
+.sad-attachments h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sad-description {
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+}
+
+.sad-description p {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.sad-files-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sad-file-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #6366f1;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.sad-file-item:hover {
+  border-color: #6366f1;
+  background: #eff6ff;
+}
+
+.sad-submit-section {
+  margin-top: 24px;
+}
+
+.sad-btn-submit-main {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0 auto;
+}
+
+.sad-btn-submit-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+/* ─── Alerts ───────────────────────────────────────────────────────────── */
+.sad-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 20px;
+}
+
+.sad-alert-error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.sad-alert-info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+/* ─── Submission Card ──────────────────────────────────────────────────── */
+.sad-submission-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.sad-text-content,
+.sad-files-section,
+.sad-feedback-section {
+  margin-bottom: 20px;
+}
+
+.sad-text-content strong,
+.sad-files-section strong,
+.sad-feedback-section strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sad-text-content p {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.6;
+  margin: 0;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #6366f1;
+}
+
+.sad-feedback-section {
+  padding: 20px;
+  background: #fef3c7;
+  border-radius: 12px;
+  border-left: 4px solid #f59e0b;
+}
+
+.sad-feedback-section strong {
+  color: #92400e;
+}
+
+.sad-feedback-section p {
+  font-size: 14px;
+  color: #78350f;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ─── Modal ────────────────────────────────────────────────────────────── */
+.sad-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: sad-fade-in 0.2s ease-out;
+}
+
+@keyframes sad-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sad-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: sad-slide-up 0.3s ease-out;
+}
+
+@keyframes sad-slide-up {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sad-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.sad-modal-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.sad-modal-close {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 8px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sad-modal-close:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.sad-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sad-modal-form {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─── Form ─────────────────────────────────────────────────────────────── */
+.sad-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sad-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sad-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s;
+}
+
+.sad-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.sad-textarea:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.sad-form-help {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ─── File Upload ──────────────────────────────────────────────────────── */
+.sad-file-upload-area {
+  position: relative;
+}
+
+.sad-file-input {
+  position: absolute;
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.sad-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sad-file-label:hover {
+  border-color: #6366f1;
+  background: #eff6ff;
+}
+
+.sad-file-input:disabled + .sad-file-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.sad-file-label svg {
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+.sad-file-label-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 6px;
+}
+
+.sad-file-label-hint {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.sad-files-list-modal {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.sad-files-list-modal h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sad-file-item-modal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.sad-file-item-modal:last-child {
+  margin-bottom: 0;
+}
+
+.sad-file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.sad-file-info svg {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.sad-file-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sad-file-size {
+  font-size: 12px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.sad-btn-remove-file {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 6px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.sad-btn-remove-file:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.sad-btn-remove-file:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sad-file-download-btn {
+  background: #dbeafe;
+  color: #1e40af;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+/* ─── Notice ───────────────────────────────────────────────────────────── */
+.sad-notice {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+}
+
+.sad-notice svg {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sad-notice-content {
+  flex: 1;
+}
+
+.sad-notice-content strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e40af;
+  margin-bottom: 6px;
+}
+
+.sad-notice-content p {
+  font-size: 13px;
+  color: #1e40af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ─── Form Actions ─────────────────────────────────────────────────────── */
+.sad-form-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 0;
+}
+
+.sad-btn-cancel,
+.sad-btn-submit {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sad-btn-cancel {
+  background: #f3f4f6;
+  color: #4b5563;
+  border: 1.5px solid #e5e7eb;
+}
+
+.sad-btn-cancel:hover:not(:disabled) {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.sad-btn-submit {
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  color: #fff;
+}
+
+.sad-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.sad-btn-cancel:disabled,
+.sad-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sad-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: sad-spin 0.6s linear infinite;
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sad-content {
+    margin: 1rem auto;
+    padding: 0 0.75rem;
+  }
+
+  .sad-card {
+    padding: 20px;
+  }
+
+  .sad-card-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .sad-title {
+    font-size: 22px;
+  }
+
+  .sad-meta-grid,
+  .sad-submission-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .sad-badges {
+    width: 100%;
+  }
+
+  .sad-modal {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+  }
+
+  .sad-form-actions {
+    flex-direction: column;
+  }
+}

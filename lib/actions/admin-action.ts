@@ -9,42 +9,40 @@ const API_URL =
    HELPER FUNCTION
 ========================= */
 // Helper to check if teacher teaches a class/section
+// NEW VERSION - handles new format
 function teacherTeachesClassSection(teacher: any, targetClassId: string, targetSectionId: string): boolean {
-  if (!teacher.classId || !teacher.sectionId) return false;
+  if (!teacher.classId) return false;
 
   try {
-    // Parse classId (might be array string like '["11","12"]' or simple string like "11")
-    let teacherClasses: string[] = [];
-    if (teacher.classId.startsWith('[')) {
-      teacherClasses = JSON.parse(teacher.classId);
+    // NEW: Parse class-section pairs like:
+    // [{"classId":"11","sections":["A","B"]},{"classId":"12","sections":["D"]}]
+    let classSectionPairs: Array<{classId: string, sections: string[]}> = [];
+    
+    if (teacher.classId.startsWith('[{')) {
+      // New format: class-section pairs
+      classSectionPairs = JSON.parse(teacher.classId);
+    } else if (teacher.classId.startsWith('[')) {
+      // Legacy format: separate class and section arrays
+      const teacherClasses = JSON.parse(teacher.classId);
+      const teacherSections = teacher.sectionId ? JSON.parse(teacher.sectionId) : [];
+      classSectionPairs = teacherClasses.map((cls: string) => ({
+        classId: cls,
+        sections: teacherSections
+      }));
     } else {
-      teacherClasses = [teacher.classId];
+      // Single value format
+      classSectionPairs = [{
+        classId: teacher.classId,
+        sections: teacher.sectionId ? [teacher.sectionId] : []
+      }];
     }
 
-    // Parse sectionId
-    let teacherSections: string[] = [];
-    if (teacher.sectionId.startsWith('[')) {
-      teacherSections = JSON.parse(teacher.sectionId);
-    } else {
-      teacherSections = [teacher.sectionId];
-    }
+    // Check if any pair matches the target class and section
+    const matches = classSectionPairs.some(pair => 
+      pair.classId === targetClassId && pair.sections.includes(targetSectionId)
+    );
 
-    // Check if arrays contain the target values
-    const teachesClass = teacherClasses.includes(targetClassId);
-    const teachesSection = teacherSections.includes(targetSectionId);
-
-    console.log('Teacher filter check:', {
-      teacherName: teacher.fullName,
-      teacherClasses,
-      teacherSections,
-      targetClassId,
-      targetSectionId,
-      teachesClass,
-      teachesSection,
-      matches: teachesClass && teachesSection
-    });
-
-    return teachesClass && teachesSection;
+    return matches;
   } catch (error) {
     console.error('Error parsing teacher class/section:', error);
     return false;
@@ -107,7 +105,7 @@ export async function getAllUsersAction() {
 
 /* =========================
    GET FILTERED TEACHERS
-   NEW: This filters teachers on the server side
+   This filters teachers on the server side
 ========================= */
 export async function getFilteredTeachersAction(classId: string, sectionId: string) {
   try {
@@ -156,6 +154,94 @@ export async function getFilteredTeachersAction(classId: string, sectionId: stri
     return { success: true, data: filteredTeachers };
   } catch (error: any) {
     console.error("getFilteredTeachersAction error:", error);
+    return { 
+      success: false, 
+      message: "Network error. Please check your connection and try again." 
+    };
+  }
+}
+
+/* ====================================
+   GET FILTERED STUDENTS (NEW!)
+   For assignment creation - gets students in specific class/section
+==================================== */
+export async function getFilteredStudentsAction(classId: string, sectionId: string) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return { 
+        success: false, 
+        message: "Authentication required. Please login again." 
+      };
+    }
+
+    console.log("🔍 Fetching students for Class:", classId, "Section:", sectionId);
+
+    const response = await fetch(`${API_URL}/api/admin/users`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      return {
+        success: false,
+        message: result.message || "Unable to load students.",
+      };
+    }
+
+    // Filter for role "user" (students)
+    const allStudents = result.data.filter((user: any) => user.role === "user");
+    console.log("📚 Total students in database:", allStudents.length);
+    
+    // Log all students with their class/section for debugging
+    console.log("📚 All students:");
+    allStudents.forEach((s: any) => {
+      console.log(`  - ${s.fullName}: Class="${s.classId}", Section="${s.sectionId}"`);
+    });
+
+    const filteredStudents = allStudents.filter((student: any) => {
+      // Trim whitespace and do exact comparison
+      const studentClass = String(student.classId || "").trim();
+      const studentSection = String(student.sectionId || "").trim();
+      const targetClass = String(classId).trim();
+      const targetSection = String(sectionId).trim();
+      
+      const classMatch = studentClass === targetClass;
+      const sectionMatch = studentSection === targetSection;
+      
+      if (classMatch || sectionMatch) {
+        console.log(`🔎 Checking ${student.fullName}:`, {
+          studentClass: `"${studentClass}"`,
+          targetClass: `"${targetClass}"`,
+          classMatch,
+          studentSection: `"${studentSection}"`,
+          targetSection: `"${targetSection}"`,
+          sectionMatch,
+          MATCH: classMatch && sectionMatch
+        });
+      }
+      
+      return classMatch && sectionMatch;
+    });
+
+    console.log("✅ Filtered students count:", filteredStudents.length);
+    if (filteredStudents.length > 0) {
+      console.log("✅ Filtered students:", filteredStudents.map((s: any) => s.fullName));
+    } else {
+      console.log("❌ No students found for Class", classId, "Section", sectionId);
+    }
+
+    return { success: true, data: filteredStudents };
+  } catch (error: any) {
+    console.error("❌ getFilteredStudentsAction error:", error);
     return { 
       success: false, 
       message: "Network error. Please check your connection and try again." 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import "./notification.css";
+import "./notification-popup.css";
 
 interface Notification {
   id: number;
