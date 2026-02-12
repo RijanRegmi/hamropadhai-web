@@ -171,9 +171,9 @@ export default function Dashboard() {
       isActive: false,
     },
     {
-      id: "announcement",
-      title: "Announcement",
-      description: "Latest announcements",
+      id: "notice",
+      title: "Notice",
+      description: "Latest notices",
       icon: (
         <svg
           width="28"
@@ -190,10 +190,10 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/admin/dashboard/announcement",
+      path: "/admin/dashboard/notice",
       bgColor: "#FFEDD5",
       iconColor: "#F97316",
-      isActive: false,
+      isActive: true,
     },
     {
       id: "user",

@@ -834,4 +834,133 @@
   .af-teachers-section {
     padding: 20px;
   }
+
+  .af-teachers-subtitle {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+  margin: 4px 0 0;
+}
+
+/* Clickable card base */
+.af-teacher-clickable {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.af-teacher-clickable:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.af-teacher-clickable:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ✅ SELECTED state */
+.af-teacher-selected {
+  border-color: #2563eb !important;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25), 0 4px 16px rgba(37, 99, 235, 0.2) !important;
+  transform: translateY(-2px);
+}
+
+/* Circular checkmark top-right corner */
+.af-teacher-check-circle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  color: transparent;
+}
+
+.af-teacher-check-circle.visible {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+/* Badge: "Available" → "✓ Selected" */
+.af-teacher-badge {
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.af-teacher-badge-selected {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+/* Summary bar at the bottom of the teacher section */
+.af-selected-summary {
+  margin-top: 20px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 2px solid #bfdbfe;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.af-selected-summary svg {
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.af-selected-summary span {
+  flex: 1;
+  font-size: 14px;
+  color: #1e40af;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.af-selected-summary strong {
+  font-weight: 800;
+}
+
+/* "Clear all" button inside summary */
+.af-clear-teachers {
+  padding: 6px 14px;
+  background: transparent;
+  border: 2px solid #93c5fd;
+  border-radius: 8px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.af-clear-teachers:hover {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
 }

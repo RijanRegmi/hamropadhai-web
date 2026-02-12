@@ -1,0 +1,320 @@
+.af-page {
+          min-height: 100vh;
+          background: #f0f4f8;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .af-header {
+          background: #fff;
+          border-bottom: 1px solid #e5e7eb;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .af-header-inner {
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 2rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 64px;
+        }
+
+        .af-brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .af-header-actions {
+          display: flex;
+          gap: 12px;
+        }
+
+        .af-btn-cancel {
+          padding: 9px 24px;
+          background: #fff;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          color: #6b7280;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .af-btn-cancel:hover {
+          border-color: #ef4444;
+          color: #ef4444;
+          background: #fef2f2;
+        }
+
+        .af-btn-save {
+          padding: 9px 24px;
+          background: linear-gradient(135deg, #6366f1, #a855f7);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .af-btn-save:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+        .af-btn-save:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .af-content {
+          flex: 1;
+          max-width: 900px;
+          width: 100%;
+          margin: 2rem auto;
+          padding: 0 1.5rem;
+        }
+
+        .af-card {
+          background: #fff;
+          border-radius: 20px;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+          padding: 40px 44px 44px;
+        }
+
+        .af-card-title {
+          font-size: 22px;
+          font-weight: 700;
+          color: #111827;
+          margin: 0 0 4px;
+        }
+
+        .af-card-sub {
+          font-size: 14px;
+          color: #6b7280;
+          margin: 0 0 32px;
+        }
+
+        .af-form-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 24px;
+        }
+
+        .af-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .af-field-full {
+          grid-column: 1 / -1;
+        }
+
+        .af-label {
+          font-size: 14px;
+          font-weight: 600;
+          color: #374151;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .af-input,
+        .af-textarea,
+        .af-select {
+          padding: 12px 14px;
+          background: #fff;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #111827;
+          font-family: inherit;
+          transition: all 0.2s;
+        }
+
+        .af-input:focus,
+        .af-textarea:focus,
+        .af-select:focus {
+          outline: none;
+          border-color: #6366f1;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        .af-textarea {
+          resize: vertical;
+          min-height: 120px;
+          line-height: 1.6;
+        }
+
+        .af-char-count {
+          font-size: 12px;
+          color: #9ca3af;
+          text-align: right;
+          margin-top: -4px;
+        }
+
+        .af-field-hint {
+          font-size: 12px;
+          color: #6b7280;
+          display: block;
+          margin-top: 4px;
+        }
+
+        .af-file-upload-zone {
+          position: relative;
+          border: 2px dashed #d1d5db;
+          border-radius: 12px;
+          padding: 32px 24px;
+          text-align: center;
+          transition: all 0.2s;
+          background: #f9fafb;
+        }
+
+        .af-file-upload-zone:hover {
+          border-color: #6366f1;
+          background: #eff6ff;
+        }
+
+        .af-file-input {
+          position: absolute;
+          width: 0;
+          height: 0;
+          opacity: 0;
+          overflow: hidden;
+        }
+
+        .af-file-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          color: #6366f1;
+        }
+
+        .af-file-label svg {
+          width: 32px;
+          height: 32px;
+          color: #6366f1;
+        }
+
+        .af-file-label span {
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .af-file-hint {
+          font-size: 12px;
+          color: #6b7280;
+          font-weight: 400;
+        }
+
+        .af-attached-files {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 16px;
+        }
+
+        .af-file-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px;
+          background: #f9fafb;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+
+        .af-file-item:hover {
+          background: #f3f4f6;
+        }
+
+        .af-file-info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1;
+        }
+
+        .af-file-info svg {
+          width: 18px;
+          height: 18px;
+          color: #6b7280;
+          flex-shrink: 0;
+        }
+
+        .af-file-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: #111827;
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .af-file-size {
+          font-size: 12px;
+          color: #6b7280;
+          margin-left: auto;
+          padding: 0 8px;
+        }
+
+        .af-file-remove {
+          padding: 6px;
+          background: #fef2f2;
+          border: 1px solid #fee2e2;
+          border-radius: 6px;
+          color: #ef4444;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .af-file-remove:hover {
+          background: #fee2e2;
+        }
+
+        .af-file-remove svg {
+          width: 14px;
+          height: 14px;
+        }
+
+        @media (max-width: 768px) {
+          .af-content {
+            margin: 1rem auto;
+            padding: 0 0.75rem;
+          }
+
+          .af-card {
+            padding: 24px 20px;
+          }
+
+          .af-form-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .af-header-inner {
+            padding: 0 1rem;
+          }
+
+          .af-header-actions {
+            gap: 8px;
+          }
+
+          .af-btn-cancel,
+          .af-btn-save {
+            padding: 8px 16px;
+            font-size: 13px;
+          }
+        }

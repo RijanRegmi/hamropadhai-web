@@ -1,0 +1,547 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   edit-notice.css - Edit Notice Form Styling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.edit-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header ───────────────────────────────────────────────────────────── */
+.edit-header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.edit-header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.edit-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-brand-title {
+  object-fit: contain;
+}
+
+.edit-header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.edit-btn-cancel {
+  padding: 10px 24px;
+  background: #fff;
+  border: 2px solid #ef4444;
+  border-radius: 10px;
+  color: #ef4444;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.edit-btn-cancel:hover {
+  background: #ef4444;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.edit-btn-save {
+  padding: 10px 28px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.edit-btn-save:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.edit-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ─── Loading State ────────────────────────────────────────────────────── */
+.edit-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  gap: 20px;
+}
+
+.edit-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: edit-spin 0.8s linear infinite;
+}
+
+@keyframes edit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.edit-loading p {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ─── Main Content ─────────────────────────────────────────────────────── */
+.edit-content {
+  flex: 1;
+  max-width: 900px;
+  width: 100%;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.edit-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  padding: 44px 48px;
+  animation: edit-fadeIn 0.5s ease-out;
+}
+
+@keyframes edit-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.edit-card-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1f2937;
+  margin: 0 0 6px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.edit-card-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 36px;
+  line-height: 1.5;
+}
+
+.edit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-field-full {
+  grid-column: 1 / -1;
+}
+
+.edit-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.edit-input,
+.edit-textarea,
+.edit-select {
+  padding: 13px 16px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #1f2937;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.edit-input:focus,
+.edit-textarea:focus,
+.edit-select:focus {
+  outline: none;
+  border-color: #667eea;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.edit-textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.7;
+}
+
+.edit-char-count {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: right;
+  margin-top: -6px;
+}
+
+/* ─── Class & Section Selection ────────────────────────────────────────── */
+.edit-class-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edit-class-box {
+  padding: 20px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s;
+}
+
+.edit-class-box:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.edit-class-header {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 14px;
+  align-items: center;
+}
+
+.edit-btn-remove-class {
+  padding: 10px 16px;
+  background: #fee2e2;
+  border: none;
+  border-radius: 8px;
+  color: #dc2626;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-btn-remove-class:hover {
+  background: #fecaca;
+  transform: scale(1.05);
+}
+
+.edit-section-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.edit-sections-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.edit-section-badge {
+  padding: 10px 18px;
+  background: #fff;
+  color: #374151;
+  border: 2px solid #d1d5db;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.edit-section-badge:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.edit-section-badge.active {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  border-color: #667eea;
+}
+
+.edit-btn-add-class {
+  padding: 14px;
+  background: #fff;
+  border: 2px dashed #667eea;
+  border-radius: 12px;
+  color: #667eea;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.edit-btn-add-class:hover {
+  background: #eff6ff;
+  border-style: solid;
+  transform: scale(1.02);
+}
+
+/* ─── File Upload ──────────────────────────────────────────────────────── */
+.edit-file-upload-zone {
+  position: relative;
+  border: 3px dashed #cbd5e1;
+  border-radius: 14px;
+  padding: 36px 24px;
+  text-align: center;
+  transition: all 0.3s;
+  background: linear-gradient(135deg, #f9fafb 0%, #fff 100%);
+  margin-top: 12px;
+}
+
+.edit-file-upload-zone:hover {
+  border-color: #667eea;
+  background: #eff6ff;
+}
+
+.edit-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.edit-file-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  color: #667eea;
+}
+
+.edit-file-label svg {
+  width: 36px;
+  height: 36px;
+  color: #667eea;
+}
+
+.edit-file-label span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.edit-file-hint {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.edit-attached-files {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.edit-attached-files.existing-files {
+  margin-bottom: 16px;
+}
+
+.edit-attached-files.new-files {
+  margin-top: 16px;
+}
+
+.edit-files-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.edit-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.edit-file-item:hover {
+  background: #fff;
+  border-color: #667eea;
+  transform: translateX(4px);
+}
+
+.edit-file-item.existing {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #fbbf24;
+}
+
+.edit-file-item.existing:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+}
+
+.edit-file-item.new {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: #3b82f6;
+}
+
+.edit-file-item.new:hover {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+}
+
+.edit-file-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.edit-file-info svg {
+  width: 18px;
+  height: 18px;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.edit-file-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.edit-file-size {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  padding: 0 10px;
+}
+
+.edit-file-remove {
+  padding: 8px;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-file-remove:hover {
+  background: #fecaca;
+  transform: scale(1.1);
+}
+
+.edit-file-remove svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ─── Info Box ─────────────────────────────────────────────────────────── */
+.edit-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-left: 4px solid #3b82f6;
+  border-radius: 12px;
+  margin-top: 28px;
+}
+
+.edit-info-box svg {
+  width: 22px;
+  height: 22px;
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.edit-info-box span {
+  font-size: 14px;
+  color: #1e40af;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .edit-content {
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+  }
+
+  .edit-card {
+    padding: 28px 24px;
+  }
+
+  .edit-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-header-inner {
+    padding: 0 1rem;
+  }
+
+  .edit-header-actions {
+    gap: 8px;
+  }
+
+  .edit-btn-cancel,
+  .edit-btn-save {
+    padding: 9px 16px;
+    font-size: 13px;
+  }
+
+  .edit-card-title {
+    font-size: 22px;
+  }
+}

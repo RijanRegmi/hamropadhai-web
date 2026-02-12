@@ -37,7 +37,6 @@ interface Student {
   sectionId: string;
   profileImage?: string;
 }
-
 interface Teacher {
   _id: string;
   fullName: string;
@@ -56,17 +55,15 @@ export default function CreateAssignmentPage() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+  // ✅ MULTI-SELECT: array of selected teacher IDs
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
 
   const getCurrentAcademicYear = () => {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-
-    if (currentMonth < 3) {
-      return `${currentYear - 1}-${currentYear}`;
-    } else {
-      return `${currentYear}-${currentYear + 1}`;
-    }
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    return m < 3 ? `${y - 1}-${y}` : `${y}-${y + 1}`;
   };
 
   const [form, setForm] = useState({
@@ -79,7 +76,6 @@ export default function CreateAssignmentPage() {
     totalMarks: 100,
     dueDate: "",
     dueTime: "23:59",
-    assignedTeacherId: "", // REQUIRED field
   });
 
   useEffect(() => {
@@ -89,7 +85,7 @@ export default function CreateAssignmentPage() {
     } else {
       setFilteredStudents([]);
       setFilteredTeachers([]);
-      setForm((prev) => ({ ...prev, assignedTeacherId: "" }));
+      setSelectedTeacherIds([]);
     }
   }, [form.classId, form.sectionId]);
 
@@ -100,25 +96,20 @@ export default function CreateAssignmentPage() {
         form.classId,
         form.sectionId,
       );
-
       if (result.success) {
         setFilteredStudents(result.data);
-        if (result.data.length > 0) {
-          toast.success(
-            `${result.data.length} student(s) found in Class ${form.classId}-${form.sectionId}`,
-          );
-        } else {
+        if (result.data.length > 0)
+          toast.success(`${result.data.length} student(s) found`);
+        else
           toast.error(
-            `No students found in Class ${form.classId}-${form.sectionId}. Please check enrollment.`,
+            `No students in Class ${form.classId}-${form.sectionId}`,
             { duration: 4000 },
           );
-        }
       } else {
         toast.error(result.message || "Failed to load students");
         setFilteredStudents([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch students:", error);
+    } catch {
       toast.error("Failed to load students");
       setFilteredStudents([]);
     } finally {
@@ -133,24 +124,32 @@ export default function CreateAssignmentPage() {
         form.classId,
         form.sectionId,
       );
-
       if (result.success) {
         setFilteredTeachers(result.data);
-        if (result.data.length === 0) {
+        // Reset selection when class/section changes
+        setSelectedTeacherIds([]);
+        if (result.data.length === 0)
           toast.error(
-            `⚠️ No teachers assigned to Class ${form.classId}-${form.sectionId}. Please assign a teacher first.`,
+            `No teachers for Class ${form.classId}-${form.sectionId}`,
             { duration: 5000 },
           );
-        }
       } else {
         setFilteredTeachers([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch teachers:", error);
+    } catch {
       setFilteredTeachers([]);
     } finally {
       setIsLoadingTeachers(false);
     }
+  };
+
+  // ✅ Toggle individual teacher selection
+  const toggleTeacher = (teacherId: string) => {
+    setSelectedTeacherIds((prev) =>
+      prev.includes(teacherId)
+        ? prev.filter((id) => id !== teacherId)
+        : [...prev, teacherId],
+    );
   };
 
   const onChange = (
@@ -165,22 +164,14 @@ export default function CreateAssignmentPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
-
-      // Validate file size (10MB max per file)
-      const invalidFiles = newFiles.filter(
-        (file) => file.size > 10 * 1024 * 1024,
-      );
-      if (invalidFiles.length > 0) {
-        toast.error("Some files exceed 10MB limit");
+      if (newFiles.some((f) => f.size > 10 * 1024 * 1024)) {
+        toast.error("Some files exceed 10MB");
         return;
       }
-
-      // Max 10 files total
       if (attachments.length + newFiles.length > 10) {
-        toast.error("Maximum 10 files allowed");
+        toast.error("Maximum 10 files");
         return;
       }
-
       setAttachments((prev) => [...prev, ...newFiles]);
       toast.success(`${newFiles.length} file(s) added`);
     }
@@ -188,54 +179,42 @@ export default function CreateAssignmentPage() {
 
   const removeAttachment = (index: number) => {
     setAttachments((prev) => prev.filter((_, i) => i !== index));
-    toast.success("File removed");
   };
 
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
+      const missing: string[] = [];
+      if (!form.title.trim()) missing.push("Title");
+      if (!form.description.trim()) missing.push("Description");
+      if (!form.subject) missing.push("Subject");
+      if (!form.classId) missing.push("Class");
+      if (!form.sectionId) missing.push("Section");
+      if (!form.dueDate) missing.push("Due Date");
+      if (!form.dueTime) missing.push("Due Time");
+      if (selectedTeacherIds.length === 0) missing.push("At least one Teacher");
 
-      // Validation
-      const missingFields: string[] = [];
-      if (!form.title.trim()) missingFields.push("Assignment Title");
-      if (!form.description.trim()) missingFields.push("Description");
-      if (!form.subject) missingFields.push("Subject");
-      if (!form.classId) missingFields.push("Class");
-      if (!form.sectionId) missingFields.push("Section");
-      if (!form.dueDate) missingFields.push("Due Date");
-      if (!form.dueTime) missingFields.push("Due Time");
-      if (!form.assignedTeacherId) missingFields.push("Assigned Teacher"); // ✅ REQUIRED
-
-      if (missingFields.length > 0) {
-        const errorMessage = `Please fill in the following required fields:\n• ${missingFields.join("\n• ")}`;
-        toast.error(errorMessage, { duration: 5000 });
+      if (missing.length > 0) {
+        toast.error(`Please fill in: ${missing.join(", ")}`, {
+          duration: 5000,
+        });
         return;
       }
-
       if (form.totalMarks < 1 || form.totalMarks > 1000) {
-        toast.error("Total marks must be between 1 and 1000");
+        toast.error("Total marks must be 1–1000");
         return;
       }
 
-      // Date validation
-      const dueDateTimeString = `${form.dueDate}T${form.dueTime}:00`;
-      const dueDateTime = new Date(dueDateTimeString);
-      const now = new Date();
-
-      if (dueDateTime <= now) {
-        toast.error("⏰ Due date and time must be in the future");
+      const dueDateTime = new Date(`${form.dueDate}T${form.dueTime}:00`);
+      if (dueDateTime <= new Date()) {
+        toast.error("Due date must be in the future");
         return;
       }
-
       if (filteredStudents.length === 0) {
-        toast.error(
-          `❌ Cannot create assignment: No students found in Class ${form.classId} - Section ${form.sectionId}. Please enroll students first.`,
-          { duration: 5000 },
-        );
+        toast.error("No students in this class/section");
         return;
       }
 
-      // Create FormData for file upload
       const formData = new FormData();
       formData.append("title", form.title.trim());
       formData.append("description", form.description.trim());
@@ -245,20 +224,11 @@ export default function CreateAssignmentPage() {
       formData.append("academicYear", form.academicYear);
       formData.append("totalMarks", form.totalMarks.toString());
       formData.append("dueDate", dueDateTime.toISOString());
-
-      // ✅ ALWAYS append assignedTeacherId (REQUIRED)
-      formData.append("assignedTeacherId", form.assignedTeacherId);
-
-      // Append files with the field name "attachments"
-      attachments.forEach((file) => {
-        formData.append("attachments", file);
-      });
-
-      console.log("📤 Submitting assignment with", attachments.length, "files");
-      console.log("📤 Assigned Teacher ID:", form.assignedTeacherId);
+      // ✅ Send as JSON array string
+      formData.append("assignedTeacherIds", JSON.stringify(selectedTeacherIds));
+      attachments.forEach((f) => formData.append("attachments", f));
 
       const result = await createAssignmentWithFilesAction(formData);
-
       if (!result.success) {
         toast.error(result.message || "Failed to create assignment", {
           duration: 4000,
@@ -267,18 +237,12 @@ export default function CreateAssignmentPage() {
       }
 
       toast.success(
-        `✅ Assignment created successfully! ${filteredStudents.length} student(s) will be notified.`,
+        `✅ Assignment created! ${filteredStudents.length} student(s) notified.`,
         { duration: 3000 },
       );
-
-      setTimeout(() => {
-        router.push("/admin/dashboard/assignments");
-      }, 1500);
+      setTimeout(() => router.push("/admin/dashboard/assignments"), 1500);
     } catch (error: any) {
-      console.error("❌ Assignment creation error:", error);
-      toast.error(error.message || "Failed to create assignment", {
-        duration: 4000,
-      });
+      toast.error(error.message || "Failed to create assignment");
     } finally {
       setIsSaving(false);
     }
@@ -286,24 +250,30 @@ export default function CreateAssignmentPage() {
 
   const getProfileImageUrl = (profileImage?: string) => {
     if (!profileImage) return null;
-    if (profileImage.startsWith("http")) return profileImage;
-    return `${API_URL}${profileImage}`;
+    return profileImage.startsWith("http")
+      ? profileImage
+      : `${API_URL}${profileImage}`;
   };
 
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
   const today = new Date().toISOString().split("T")[0];
-  const isFormValid = () => {
-    return (
-      form.title.trim() &&
-      form.description.trim() &&
-      form.subject &&
-      form.classId &&
-      form.sectionId &&
-      form.dueDate &&
-      form.dueTime &&
-      form.assignedTeacherId && // ✅ REQUIRED
-      filteredStudents.length > 0
-    );
-  };
+  const isFormValid = () =>
+    form.title.trim() &&
+    form.description.trim() &&
+    form.subject &&
+    form.classId &&
+    form.sectionId &&
+    form.dueDate &&
+    form.dueTime &&
+    selectedTeacherIds.length > 0 &&
+    filteredStudents.length > 0;
 
   return (
     <div className="af-page">
@@ -312,7 +282,7 @@ export default function CreateAssignmentPage() {
           <div className="af-brand">
             <img
               src={HamroPadhai.src}
-              alt="HamroPadhai Logo"
+              alt="HamroPadhai"
               className="af-brand-title"
             />
           </div>
@@ -327,11 +297,6 @@ export default function CreateAssignmentPage() {
               className="af-btn-save"
               onClick={handleSubmit}
               disabled={isSaving || !isFormValid()}
-              title={
-                !isFormValid()
-                  ? "Please fill in all required fields including assigned teacher"
-                  : "Create Assignment"
-              }
             >
               {isSaving ? "Creating..." : "Create Assignment"}
             </button>
@@ -358,7 +323,6 @@ export default function CreateAssignmentPage() {
                 maxLength={100}
               />
             </div>
-
             <div className="af-field af-field-full">
               <label className="af-label">Description *</label>
               <textarea
@@ -366,15 +330,14 @@ export default function CreateAssignmentPage() {
                 name="description"
                 value={form.description}
                 onChange={onChange}
-                placeholder="Provide detailed instructions for the assignment..."
+                placeholder="Provide detailed instructions..."
                 maxLength={1000}
                 rows={6}
               />
               <span className="af-char-count">
-                {form.description.length}/1000 characters
+                {form.description.length}/1000
               </span>
             </div>
-
             <div className="af-field">
               <label className="af-label">Subject *</label>
               <select
@@ -384,14 +347,13 @@ export default function CreateAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Subject</option>
-                {SUBJECTS.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
+                {SUBJECTS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Class *</label>
               <select
@@ -401,14 +363,13 @@ export default function CreateAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Class</option>
-                {CLASSES.map((cls) => (
-                  <option key={cls} value={cls}>
-                    Class {cls}
+                {CLASSES.map((c) => (
+                  <option key={c} value={c}>
+                    Class {c}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Section *</label>
               <select
@@ -418,14 +379,13 @@ export default function CreateAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Section</option>
-                {SECTIONS.map((sec) => (
-                  <option key={sec} value={sec}>
-                    Section {sec}
+                {SECTIONS.map((s) => (
+                  <option key={s} value={s}>
+                    Section {s}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Academic Year *</label>
               <select
@@ -435,17 +395,15 @@ export default function CreateAssignmentPage() {
                 onChange={onChange}
               >
                 {[...Array(5)].map((_, i) => {
-                  const year = new Date().getFullYear() + i - 2;
-                  const academicYear = `${year}-${year + 1}`;
+                  const y = new Date().getFullYear() + i - 2;
                   return (
-                    <option key={academicYear} value={academicYear}>
-                      {academicYear}
+                    <option key={y} value={`${y}-${y + 1}`}>
+                      {y}-{y + 1}
                     </option>
                   );
                 })}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Total Marks *</label>
               <input
@@ -458,7 +416,6 @@ export default function CreateAssignmentPage() {
                 max="1000"
               />
             </div>
-
             <div className="af-field">
               <label className="af-label">Due Date *</label>
               <input
@@ -470,7 +427,6 @@ export default function CreateAssignmentPage() {
                 min={today}
               />
             </div>
-
             <div className="af-field">
               <label className="af-label">Due Time *</label>
               <input
@@ -480,42 +436,6 @@ export default function CreateAssignmentPage() {
                 value={form.dueTime}
                 onChange={onChange}
               />
-            </div>
-
-            {/* ✅ REQUIRED TEACHER FIELD */}
-            <div className="af-field af-field-full">
-              <label className="af-label">Assign Teacher *</label>
-              <select
-                className="af-input af-select"
-                name="assignedTeacherId"
-                value={form.assignedTeacherId}
-                onChange={onChange}
-                disabled={!form.classId || !form.sectionId || isLoadingTeachers}
-                required
-              >
-                <option value="">
-                  {!form.classId || !form.sectionId
-                    ? "Select class and section first"
-                    : isLoadingTeachers
-                      ? "Loading teachers..."
-                      : "Select a teacher (Required)"}
-                </option>
-                {filteredTeachers.map((teacher) => (
-                  <option key={teacher._id} value={teacher._id}>
-                    {teacher.fullName} (@{teacher.username})
-                  </option>
-                ))}
-              </select>
-              <span
-                className="af-field-hint"
-                style={{
-                  color: filteredTeachers.length === 0 ? "red" : "inherit",
-                }}
-              >
-                {filteredTeachers.length === 0 && form.classId && form.sectionId
-                  ? "⚠️ No teachers available for this class/section. Please assign a teacher first."
-                  : "Teacher assignment is required for creating assignments."}
-              </span>
             </div>
 
             {/* FILE UPLOAD */}
@@ -548,12 +468,10 @@ export default function CreateAssignmentPage() {
                   </svg>
                   <span>Click to upload files</span>
                   <span className="af-file-hint">
-                    PDF, DOC, PPT, XLS, TXT, Images (Max 10MB each, 10 files
-                    total)
+                    PDF, DOC, PPT, XLS, TXT, Images (Max 10MB each)
                   </span>
                 </label>
               </div>
-
               {attachments.length > 0 && (
                 <div className="af-attached-files">
                   {attachments.map((file, index) => (
@@ -599,52 +517,147 @@ export default function CreateAssignmentPage() {
             </div>
           </div>
 
-          {/* TEACHERS WITH PROFILE PICTURES */}
-          {form.classId && form.sectionId && filteredTeachers.length > 0 && (
+          {/* ✅ CLICKABLE MULTI-SELECT TEACHER CARDS */}
+          {form.classId && form.sectionId && (
             <div className="af-teachers-section">
               <div className="af-teachers-header">
-                <h3 className="af-teachers-title">Available Teachers</h3>
+                <div>
+                  <h3 className="af-teachers-title">Assign Teachers *</h3>
+                  <p className="af-teachers-subtitle">
+                    {selectedTeacherIds.length === 0
+                      ? "Click a teacher card to assign them to this assignment"
+                      : `${selectedTeacherIds.length} teacher${selectedTeacherIds.length > 1 ? "s" : ""} selected`}
+                  </p>
+                </div>
                 <span className="af-teachers-count">
-                  {filteredTeachers.length} teacher(s)
+                  {isLoadingTeachers
+                    ? "Loading..."
+                    : `${filteredTeachers.length} available`}
                 </span>
               </div>
-              <div className="af-teachers-list">
-                {filteredTeachers.map((teacher) => {
-                  const profileUrl = getProfileImageUrl(teacher.profileImage);
-                  return (
-                    <div key={teacher._id} className="af-teacher-item">
-                      <div className="af-teacher-avatar">
-                        {profileUrl ? (
-                          <img
-                            src={profileUrl}
-                            alt={teacher.fullName}
-                            className="af-avatar-image"
-                          />
-                        ) : (
-                          teacher.fullName.charAt(0).toUpperCase()
+
+              {isLoadingTeachers ? (
+                <div className="af-students-loading">
+                  <div className="af-spinner-small" />
+                  <span>Loading teachers...</span>
+                </div>
+              ) : filteredTeachers.length === 0 ? (
+                <div className="af-students-empty">
+                  <p>
+                    ⚠️ No teachers assigned to Class {form.classId}-
+                    {form.sectionId}
+                  </p>
+                  <small>
+                    Please assign a teacher to this class/section first
+                  </small>
+                </div>
+              ) : (
+                <div className="af-teachers-list">
+                  {filteredTeachers.map((teacher) => {
+                    const isSelected = selectedTeacherIds.includes(teacher._id);
+                    const hasErr = imgErrors.has(teacher._id);
+                    const profileUrl =
+                      teacher.profileImage && !hasErr
+                        ? getProfileImageUrl(teacher.profileImage)
+                        : null;
+
+                    return (
+                      <div
+                        key={teacher._id}
+                        className={`af-teacher-item af-teacher-selectable${isSelected ? " af-teacher-selected" : ""}`}
+                        onClick={() => toggleTeacher(teacher._id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && toggleTeacher(teacher._id)
+                        }
+                        aria-pressed={isSelected}
+                      >
+                        {/* Selected checkmark */}
+                        {isSelected && (
+                          <div className="af-teacher-check">
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          </div>
                         )}
-                      </div>
-                      <div className="af-teacher-info">
-                        <div className="af-teacher-name">
-                          {teacher.fullName}
+                        <div className="af-teacher-avatar">
+                          {profileUrl ? (
+                            <img
+                              src={profileUrl}
+                              alt={teacher.fullName}
+                              className="af-avatar-image"
+                              onError={() =>
+                                setImgErrors((prev) =>
+                                  new Set(prev).add(teacher._id),
+                                )
+                              }
+                            />
+                          ) : (
+                            <span>{getInitials(teacher.fullName)}</span>
+                          )}
                         </div>
-                        <div className="af-teacher-username">
-                          @{teacher.username}
+                        <div className="af-teacher-info">
+                          <div className="af-teacher-name">
+                            {teacher.fullName}
+                          </div>
+                          <div className="af-teacher-username">
+                            @{teacher.username}
+                          </div>
+                        </div>
+                        <div
+                          className={`af-teacher-badge${isSelected ? " af-teacher-badge-selected" : ""}`}
+                        >
+                          {isSelected ? "✓ Selected" : "Available"}
                         </div>
                       </div>
-                      <div className="af-teacher-badge">
-                        {form.assignedTeacherId === teacher._id
-                          ? "✓ Selected"
-                          : "Available"}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Selected summary */}
+              {selectedTeacherIds.length > 0 && (
+                <div className="af-selected-summary">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <span>
+                    Assigned:{" "}
+                    {filteredTeachers
+                      .filter((t) => selectedTeacherIds.includes(t._id))
+                      .map((t) => t.fullName)
+                      .join(", ")}
+                  </span>
+                  <button
+                    className="af-clear-teachers"
+                    onClick={() => setSelectedTeacherIds([])}
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          {/* STUDENTS WITH PROFILE PICTURES */}
+          {/* STUDENTS */}
           {form.classId && form.sectionId && (
             <div className="af-students-section">
               <div className="af-students-header">
@@ -657,11 +670,10 @@ export default function CreateAssignmentPage() {
                     : `${filteredStudents.length} student(s)`}
                 </span>
               </div>
-
               {isLoadingStudents ? (
                 <div className="af-students-loading">
-                  <div className="af-spinner-small"></div>
-                  <span>Loading students...</span>
+                  <div className="af-spinner-small" />
+                  <span>Loading...</span>
                 </div>
               ) : filteredStudents.length > 0 ? (
                 <div className="af-students-list">
@@ -677,7 +689,7 @@ export default function CreateAssignmentPage() {
                               className="af-avatar-image"
                             />
                           ) : (
-                            student.fullName.charAt(0).toUpperCase()
+                            getInitials(student.fullName)
                           )}
                         </div>
                         <div className="af-student-info">

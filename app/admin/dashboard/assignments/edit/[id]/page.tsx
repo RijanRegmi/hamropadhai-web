@@ -26,7 +26,6 @@ const SUBJECTS = [
   "Economics",
   "Business Studies",
 ];
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050";
 
 interface Student {
@@ -38,17 +37,13 @@ interface Student {
   sectionId: string;
   profileImage?: string;
 }
-
 interface Teacher {
   _id: string;
   fullName: string;
   username: string;
   email: string;
-  classId: string;
-  sectionId: string;
   profileImage?: string;
 }
-
 interface Assignment {
   _id: string;
   title: string;
@@ -61,12 +56,8 @@ interface Assignment {
   dueDate: string;
   isActive: boolean;
   createdAt: string;
-  assignedTeacherId?: string;
-  assignedTeacher?: {
-    _id: string;
-    fullName: string;
-    username: string;
-  };
+  assignedTeacherIds?: string[];
+  assignedTeachers?: { _id: string; fullName: string; username: string }[];
   attachments?: Array<{
     fileName: string;
     fileUrl: string;
@@ -97,6 +88,9 @@ export default function EditAssignmentPage() {
   >([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(false);
   const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+  // ✅ MULTI-SELECT
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([]);
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set());
 
   const [form, setForm] = useState({
     title: "",
@@ -108,14 +102,12 @@ export default function EditAssignmentPage() {
     totalMarks: 100,
     dueDate: "",
     dueTime: "23:59",
-    assignedTeacherId: "", // REQUIRED
   });
 
   useEffect(() => {
     fetchAssignment();
   }, [assignmentId]);
 
-  // Fetch filtered students when class/section changes
   useEffect(() => {
     if (form.classId && form.sectionId) {
       fetchFilteredStudents();
@@ -133,14 +125,8 @@ export default function EditAssignmentPage() {
         form.classId,
         form.sectionId,
       );
-
-      if (result.success) {
-        setFilteredStudents(result.data);
-      } else {
-        setFilteredStudents([]);
-      }
-    } catch (error) {
-      console.error("Failed to fetch students:", error);
+      setFilteredStudents(result.success ? result.data : []);
+    } catch {
       setFilteredStudents([]);
     } finally {
       setIsLoadingStudents(false);
@@ -154,20 +140,16 @@ export default function EditAssignmentPage() {
         form.classId,
         form.sectionId,
       );
-
       if (result.success) {
         setFilteredTeachers(result.data);
-        if (result.data.length === 0) {
-          toast.error(
-            `⚠️ No teachers assigned to Class ${form.classId}-${form.sectionId}.`,
-            { duration: 5000 },
-          );
-        }
+        // Keep existing selection if teachers are still available
+        setSelectedTeacherIds((prev) =>
+          prev.filter((id) => result.data.some((t: Teacher) => t._id === id)),
+        );
       } else {
         setFilteredTeachers([]);
       }
-    } catch (error) {
-      console.error("Failed to fetch teachers:", error);
+    } catch {
       setFilteredTeachers([]);
     } finally {
       setIsLoadingTeachers(false);
@@ -178,7 +160,6 @@ export default function EditAssignmentPage() {
     try {
       setIsLoading(true);
       const result = await getAssignmentByIdAdminAction(assignmentId);
-
       if (!result.success) {
         toast.error(result.message || "Failed to fetch assignment");
         router.push("/admin/dashboard/assignments");
@@ -188,12 +169,10 @@ export default function EditAssignmentPage() {
       setAssignment(result.data);
       setExistingAttachments(result.data.attachments || []);
 
-      // Parse the dueDate to extract date and time
       const dueDate = new Date(result.data.dueDate);
       const formattedDate = dueDate.toISOString().split("T")[0];
       const hours = String(dueDate.getHours()).padStart(2, "0");
       const minutes = String(dueDate.getMinutes()).padStart(2, "0");
-      const formattedTime = `${hours}:${minutes}`;
 
       setForm({
         title: result.data.title || "",
@@ -204,15 +183,29 @@ export default function EditAssignmentPage() {
         academicYear: result.data.academicYear || "",
         totalMarks: result.data.totalMarks || 100,
         dueDate: formattedDate,
-        dueTime: formattedTime,
-        assignedTeacherId: result.data.assignedTeacherId || "", // Load existing teacher
+        dueTime: `${hours}:${minutes}`,
       });
+
+      // ✅ Pre-select existing teachers
+      const existingIds =
+        result.data.assignedTeacherIds ||
+        result.data.assignedTeachers?.map((t: any) => t._id || t) ||
+        [];
+      setSelectedTeacherIds(existingIds.map((id: any) => id.toString()));
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch assignment");
       router.push("/admin/dashboard/assignments");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleTeacher = (teacherId: string) => {
+    setSelectedTeacherIds((prev) =>
+      prev.includes(teacherId)
+        ? prev.filter((id) => id !== teacherId)
+        : [...prev, teacherId],
+    );
   };
 
   const onChange = (
@@ -225,86 +218,52 @@ export default function EditAssignmentPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-
-      // Validate file size (10MB max per file)
-      const invalidFiles = newFiles.filter(
-        (file) => file.size > 10 * 1024 * 1024,
-      );
-      if (invalidFiles.length > 0) {
-        toast.error("Some files exceed 10MB limit");
-        return;
-      }
-
-      // Max 10 files total (including existing)
-      if (
-        existingAttachments.length + attachments.length + newFiles.length >
-        10
-      ) {
-        toast.error("Maximum 10 files allowed in total");
-        return;
-      }
-
-      setAttachments((prev) => [...prev, ...newFiles]);
-      toast.success(`${newFiles.length} file(s) added`);
+    if (!e.target.files) return;
+    const newFiles = Array.from(e.target.files);
+    if (newFiles.some((f) => f.size > 10 * 1024 * 1024)) {
+      toast.error("Some files exceed 10MB");
+      return;
     }
+    if (
+      existingAttachments.length + attachments.length + newFiles.length >
+      10
+    ) {
+      toast.error("Maximum 10 files total");
+      return;
+    }
+    setAttachments((prev) => [...prev, ...newFiles]);
+    toast.success(`${newFiles.length} file(s) added`);
   };
 
-  const removeAttachment = (index: number) => {
+  const removeAttachment = (index: number) =>
     setAttachments((prev) => prev.filter((_, i) => i !== index));
-    toast.success("File removed");
-  };
-
-  const removeExistingAttachment = (index: number) => {
+  const removeExistingAttachment = (index: number) =>
     setExistingAttachments((prev) => prev.filter((_, i) => i !== index));
-    toast.success("Existing file will be removed on save");
-  };
 
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
+      const missing: string[] = [];
+      if (!form.title.trim()) missing.push("Title");
+      if (!form.description.trim()) missing.push("Description");
+      if (!form.subject) missing.push("Subject");
+      if (!form.classId) missing.push("Class");
+      if (!form.sectionId) missing.push("Section");
+      if (!form.dueDate) missing.push("Due Date");
+      if (selectedTeacherIds.length === 0) missing.push("At least one Teacher");
 
-      // Validation
-      const missingFields: string[] = [];
-      if (!form.title.trim()) missingFields.push("Assignment Title");
-      if (!form.description.trim()) missingFields.push("Description");
-      if (!form.subject) missingFields.push("Subject");
-      if (!form.classId) missingFields.push("Class");
-      if (!form.sectionId) missingFields.push("Section");
-      if (!form.dueDate) missingFields.push("Due Date");
-      if (!form.dueTime) missingFields.push("Due Time");
-      if (!form.assignedTeacherId) missingFields.push("Assigned Teacher"); // ✅ REQUIRED
-
-      if (missingFields.length > 0) {
-        const errorMessage = `Please fill in the following required fields:\n• ${missingFields.join("\n• ")}`;
-        toast.error(errorMessage, { duration: 5000 });
+      if (missing.length > 0) {
+        toast.error(`Please fill in: ${missing.join(", ")}`, {
+          duration: 5000,
+        });
         return;
       }
-
       if (form.totalMarks < 1 || form.totalMarks > 1000) {
-        toast.error("Total marks must be between 1 and 1000");
+        toast.error("Total marks must be 1–1000");
         return;
       }
 
-      // Check if class/section changed
-      const classChanged =
-        assignment &&
-        (assignment.classId !== form.classId ||
-          assignment.sectionId !== form.sectionId);
-
-      if (classChanged && filteredStudents.length === 0) {
-        toast.error(
-          `No students found in Class ${form.classId} - Section ${form.sectionId}`,
-        );
-        return;
-      }
-
-      // Combine date and time into ISO string
-      const dueDateTimeString = `${form.dueDate}T${form.dueTime}:00`;
-      const dueDateTime = new Date(dueDateTimeString);
-
-      // Create FormData for file upload
+      const dueDateTime = new Date(`${form.dueDate}T${form.dueTime}:00`);
       const formData = new FormData();
       formData.append("title", form.title.trim());
       formData.append("description", form.description.trim());
@@ -314,50 +273,25 @@ export default function EditAssignmentPage() {
       formData.append("academicYear", form.academicYear);
       formData.append("totalMarks", form.totalMarks.toString());
       formData.append("dueDate", dueDateTime.toISOString());
-
-      // ✅ ALWAYS append assignedTeacherId (REQUIRED)
-      formData.append("assignedTeacherId", form.assignedTeacherId);
-
-      // Append existing attachments as JSON string
+      // ✅ Send as JSON array
+      formData.append("assignedTeacherIds", JSON.stringify(selectedTeacherIds));
       formData.append(
         "existingAttachments",
         JSON.stringify(existingAttachments),
       );
-
-      // Append new files
-      attachments.forEach((file) => {
-        formData.append("attachments", file);
-      });
-
-      console.log(
-        "📤 Updating assignment with",
-        attachments.length,
-        "new files",
-      );
-      console.log("📤 Existing files:", existingAttachments.length);
-      console.log("📤 Assigned Teacher ID:", form.assignedTeacherId);
+      attachments.forEach((f) => formData.append("attachments", f));
 
       const result = await updateAssignmentWithFilesAction(
         assignmentId,
         formData,
       );
-
       if (!result.success) {
         toast.error(result.message || "Failed to update assignment");
         return;
       }
 
-      if (classChanged) {
-        toast.success(
-          `Assignment updated! Now visible to ${filteredStudents.length} student(s) in Class ${form.classId}-${form.sectionId}`,
-        );
-      } else {
-        toast.success("Assignment updated successfully!");
-      }
-
-      setTimeout(() => {
-        router.push("/admin/dashboard/assignments");
-      }, 1500);
+      toast.success("Assignment updated successfully!");
+      setTimeout(() => router.push("/admin/dashboard/assignments"), 1500);
     } catch (error: any) {
       toast.error(error.message || "Failed to update assignment");
     } finally {
@@ -367,11 +301,20 @@ export default function EditAssignmentPage() {
 
   const getProfileImageUrl = (profileImage?: string) => {
     if (!profileImage) return null;
-    if (profileImage.startsWith("http")) return profileImage;
-    return `${API_URL}${profileImage}`;
+    return profileImage.startsWith("http")
+      ? profileImage
+      : `${API_URL}${profileImage}`;
   };
 
-  if (isLoading) {
+  const getInitials = (name: string) =>
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+
+  if (isLoading)
     return (
       <div className="af-page">
         <header className="af-header">
@@ -379,48 +322,22 @@ export default function EditAssignmentPage() {
             <div className="af-brand">
               <img
                 src={HamroPadhai.src}
-                alt="HamroPadhai Logo"
-                className="af-brand-logo"
+                alt="HamroPadhai"
+                className="af-brand-title"
               />
-              <span className="af-brand-title">HamroPadhai Admin</span>
             </div>
           </div>
         </header>
         <div className="af-loading">
-          <div className="af-spinner"></div>
+          <div className="af-spinner" />
           <p>Loading assignment...</p>
         </div>
       </div>
     );
-  }
 
   if (!assignment) return null;
 
   const today = new Date().toISOString().split("T")[0];
-
-  const getMinTime = () => {
-    if (form.dueDate === today) {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      return `${hours}:${minutes}`;
-    }
-    return "00:00";
-  };
-
-  const getAcademicYearOptions = () => {
-    const currentYear = new Date().getFullYear();
-    const options = [];
-
-    for (let i = -2; i <= 2; i++) {
-      const startYear = currentYear + i;
-      const endYear = startYear + 1;
-      options.push(`${startYear}-${endYear}`);
-    }
-
-    return options;
-  };
-
   const submissionCount = assignment.submissions?.length || 0;
   const totalFiles = existingAttachments.length + attachments.length;
 
@@ -431,7 +348,7 @@ export default function EditAssignmentPage() {
           <div className="af-brand">
             <img
               src={HamroPadhai.src}
-              alt="HamroPadhai Logo"
+              alt="HamroPadhai"
               className="af-brand-title"
             />
           </div>
@@ -445,12 +362,7 @@ export default function EditAssignmentPage() {
             <button
               className="af-btn-save"
               onClick={handleSubmit}
-              disabled={isSaving || !form.assignedTeacherId}
-              title={
-                !form.assignedTeacherId
-                  ? "Teacher assignment is required"
-                  : "Update Assignment"
-              }
+              disabled={isSaving || selectedTeacherIds.length === 0}
             >
               {isSaving ? "Updating..." : "Update Assignment"}
             </button>
@@ -463,7 +375,6 @@ export default function EditAssignmentPage() {
           <h2 className="af-card-title">Edit Assignment</h2>
           <p className="af-card-sub">Update assignment information</p>
 
-          {/* Submission Warning */}
           {submissionCount > 0 && (
             <div className="af-warning-box">
               <svg
@@ -483,9 +394,7 @@ export default function EditAssignmentPage() {
                   ⚠️ {submissionCount} student(s) have already submitted
                 </strong>
                 <p>
-                  Changing class/section, teacher, or due date may affect
-                  existing submissions. Consider creating a new assignment
-                  instead.
+                  Changing teachers or due date may affect existing submissions.
                 </p>
               </div>
             </div>
@@ -499,11 +408,9 @@ export default function EditAssignmentPage() {
                 name="title"
                 value={form.title}
                 onChange={onChange}
-                placeholder="e.g., Algebra Chapter 5 Practice"
                 maxLength={100}
               />
             </div>
-
             <div className="af-field af-field-full">
               <label className="af-label">Description *</label>
               <textarea
@@ -511,15 +418,13 @@ export default function EditAssignmentPage() {
                 name="description"
                 value={form.description}
                 onChange={onChange}
-                placeholder="Provide detailed instructions for the assignment..."
                 maxLength={1000}
-                rows={6}
+                rows={5}
               />
               <span className="af-char-count">
-                {form.description.length}/1000 characters
+                {form.description.length}/1000
               </span>
             </div>
-
             <div className="af-field">
               <label className="af-label">Subject *</label>
               <select
@@ -529,14 +434,13 @@ export default function EditAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Subject</option>
-                {SUBJECTS.map((subject) => (
-                  <option key={subject} value={subject}>
-                    {subject}
+                {SUBJECTS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Class *</label>
               <select
@@ -546,14 +450,13 @@ export default function EditAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Class</option>
-                {CLASSES.map((cls) => (
-                  <option key={cls} value={cls}>
-                    Class {cls}
+                {CLASSES.map((c) => (
+                  <option key={c} value={c}>
+                    Class {c}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Section *</label>
               <select
@@ -563,14 +466,13 @@ export default function EditAssignmentPage() {
                 onChange={onChange}
               >
                 <option value="">Select Section</option>
-                {SECTIONS.map((sec) => (
-                  <option key={sec} value={sec}>
-                    Section {sec}
+                {SECTIONS.map((s) => (
+                  <option key={s} value={s}>
+                    Section {s}
                   </option>
                 ))}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Academic Year *</label>
               <select
@@ -579,14 +481,16 @@ export default function EditAssignmentPage() {
                 value={form.academicYear}
                 onChange={onChange}
               >
-                {getAcademicYearOptions().map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
+                {[...Array(5)].map((_, i) => {
+                  const y = new Date().getFullYear() + i - 2;
+                  return (
+                    <option key={y} value={`${y}-${y + 1}`}>
+                      {y}-{y + 1}
+                    </option>
+                  );
+                })}
               </select>
             </div>
-
             <div className="af-field">
               <label className="af-label">Total Marks *</label>
               <input
@@ -597,10 +501,8 @@ export default function EditAssignmentPage() {
                 onChange={onChange}
                 min="1"
                 max="1000"
-                placeholder="100"
               />
             </div>
-
             <div className="af-field">
               <label className="af-label">Due Date *</label>
               <input
@@ -612,7 +514,6 @@ export default function EditAssignmentPage() {
                 min={today}
               />
             </div>
-
             <div className="af-field">
               <label className="af-label">Due Time *</label>
               <input
@@ -621,61 +522,14 @@ export default function EditAssignmentPage() {
                 name="dueTime"
                 value={form.dueTime}
                 onChange={onChange}
-                min={form.dueDate === today ? getMinTime() : "00:00"}
               />
-              <span className="af-field-hint">
-                {form.dueDate && form.dueTime && (
-                  <>
-                    Due:{" "}
-                    {new Date(
-                      `${form.dueDate}T${form.dueTime}`,
-                    ).toLocaleString()}
-                  </>
-                )}
-              </span>
             </div>
 
-            {/* ✅ REQUIRED TEACHER FIELD */}
-            <div className="af-field af-field-full">
-              <label className="af-label">Assign Teacher *</label>
-              <select
-                className="af-input af-select"
-                name="assignedTeacherId"
-                value={form.assignedTeacherId}
-                onChange={onChange}
-                disabled={!form.classId || !form.sectionId || isLoadingTeachers}
-                required
-              >
-                <option value="">
-                  {!form.classId || !form.sectionId
-                    ? "Select class and section first"
-                    : isLoadingTeachers
-                      ? "Loading teachers..."
-                      : "Select a teacher (Required)"}
-                </option>
-                {filteredTeachers.map((teacher) => (
-                  <option key={teacher._id} value={teacher._id}>
-                    {teacher.fullName} (@{teacher.username})
-                  </option>
-                ))}
-              </select>
-              <span
-                className="af-field-hint"
-                style={{ color: !form.assignedTeacherId ? "red" : "inherit" }}
-              >
-                {!form.assignedTeacherId && form.classId && form.sectionId
-                  ? "⚠️ Teacher assignment is required. Please select a teacher."
-                  : "Teacher will be responsible for grading this assignment."}
-              </span>
-            </div>
-
-            {/* File Attachments */}
+            {/* FILE ATTACHMENTS */}
             <div className="af-field af-field-full">
               <label className="af-label">
                 Attachments ({totalFiles}/10) - Optional
               </label>
-
-              {/* Existing Files */}
               {existingAttachments.length > 0 && (
                 <div
                   className="af-attached-files"
@@ -732,8 +586,6 @@ export default function EditAssignmentPage() {
                   ))}
                 </div>
               )}
-
-              {/* Upload New Files */}
               <div className="af-file-upload-zone">
                 <input
                   type="file"
@@ -763,8 +615,6 @@ export default function EditAssignmentPage() {
                   </span>
                 </label>
               </div>
-
-              {/* New Files */}
               {attachments.length > 0 && (
                 <div
                   className="af-attached-files"
@@ -822,69 +672,145 @@ export default function EditAssignmentPage() {
             </div>
           </div>
 
-          {/* TEACHERS WITH PROFILE PICTURES */}
-          {form.classId && form.sectionId && filteredTeachers.length > 0 && (
+          {/* ✅ CLICKABLE MULTI-SELECT TEACHER CARDS */}
+          {form.classId && form.sectionId && (
             <div className="af-teachers-section">
               <div className="af-teachers-header">
-                <h3 className="af-teachers-title">Available Teachers</h3>
+                <div>
+                  <h3 className="af-teachers-title">Assign Teachers *</h3>
+                  <p className="af-teachers-subtitle">
+                    {selectedTeacherIds.length === 0
+                      ? "Click a card to select. Only selected teachers can view and grade."
+                      : `${selectedTeacherIds.length} teacher${selectedTeacherIds.length > 1 ? "s" : ""} selected`}
+                  </p>
+                </div>
                 <span className="af-teachers-count">
-                  {filteredTeachers.length} teacher(s)
+                  {isLoadingTeachers
+                    ? "Loading..."
+                    : `${filteredTeachers.length} available`}
                 </span>
               </div>
-              <div className="af-teachers-list">
-                {filteredTeachers.map((teacher) => {
-                  const profileUrl = getProfileImageUrl(teacher.profileImage);
-                  return (
-                    <div key={teacher._id} className="af-teacher-item">
-                      <div className="af-teacher-avatar">
-                        {profileUrl ? (
-                          <img
-                            src={profileUrl}
-                            alt={teacher.fullName}
-                            className="af-avatar-image"
-                          />
-                        ) : (
-                          teacher.fullName.charAt(0).toUpperCase()
-                        )}
-                      </div>
-                      <div className="af-teacher-info">
-                        <div className="af-teacher-name">
-                          {teacher.fullName}
-                        </div>
-                        <div className="af-teacher-username">
-                          @{teacher.username}
-                        </div>
-                      </div>
-                      <div className="af-teacher-badge">
-                        {form.assignedTeacherId === teacher._id
-                          ? "✓ Selected"
-                          : "Available"}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* Student List Preview */}
-          {form.classId && form.sectionId && (
-            <div className="af-students-section">
-              <div className="af-students-header">
-                <h3 className="af-students-title">
+              {isLoadingTeachers ? (
+                <div className="af-students-loading">
+                  <div className="af-spinner-small" />
+                  <span>Loading teachers...</span>
+                </div>
+              ) : filteredTeachers.length === 0 ? (
+                <div className="af-students-empty">
+                  <p>
+                    ⚠️ No teachers for Class {form.classId}-{form.sectionId}
+                  </p>
+                </div>
+              ) : (
+                <div className="af-teachers-list">
+                  {filteredTeachers.map((teacher) => {
+                    const isSelected = selectedTeacherIds.includes(teacher._id);
+                    const hasErr = imgErrors.has(teacher._id);
+                    const profileUrl =
+                      teacher.profileImage && !hasErr
+                        ? getProfileImageUrl(teacher.profileImage)
+                        : null;
+
+                    return (
+                      <div
+                        key={teacher._id}
+                        className={`af-teacher-item af-teacher-clickable${isSelected ? " af-teacher-selected" : ""}`}
+                        onClick={() => toggleTeacher(teacher._id)}
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={0}
+                        onKeyDown={(e) =>
+                          e.key === "Enter" && toggleTeacher(teacher._id)
+                        }
+                      >
+                        <div
+                          className={`af-teacher-check-circle${isSelected ? " visible" : ""}`}
+                        >
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                        <div className="af-teacher-avatar">
+                          {profileUrl ? (
+                            <img
+                              src={profileUrl}
+                              alt={teacher.fullName}
+                              className="af-avatar-image"
+                              onError={() =>
+                                setImgErrors((prev) =>
+                                  new Set(prev).add(teacher._id),
+                                )
+                              }
+                            />
+                          ) : (
+                            <span>{getInitials(teacher.fullName)}</span>
+                          )}
+                        </div>
+                        <div className="af-teacher-info">
+                          <div className="af-teacher-name">
+                            {teacher.fullName}
+                          </div>
+                          <div className="af-teacher-username">
+                            @{teacher.username}
+                          </div>
+                        </div>
+                        <div
+                          className={`af-teacher-badge${isSelected ? " af-teacher-badge-selected" : ""}`}
+                        >
+                          {isSelected ? "✓ Selected" : "Available"}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {selectedTeacherIds.length > 0 && (
+                <div className="af-selected-summary">
                   <svg
-                    width="20"
-                    height="20"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
-                    viewBox="0 0 24 24"
                   >
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                     <circle cx="9" cy="7" r="4" />
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                     <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                   </svg>
+                  <span>
+                    <strong>Assigned:</strong>{" "}
+                    {filteredTeachers
+                      .filter((t) => selectedTeacherIds.includes(t._id))
+                      .map((t) => t.fullName)
+                      .join(", ")}
+                  </span>
+                  <button
+                    className="af-clear-teachers"
+                    onClick={() => setSelectedTeacherIds([])}
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STUDENTS */}
+          {form.classId && form.sectionId && (
+            <div className="af-students-section">
+              <div className="af-students-header">
+                <h3 className="af-students-title">
                   Students in Class {form.classId} - Section {form.sectionId}
                 </h3>
                 <span className="af-students-count">
@@ -893,13 +819,7 @@ export default function EditAssignmentPage() {
                     : `${filteredStudents.length} student(s)`}
                 </span>
               </div>
-
-              {isLoadingStudents ? (
-                <div className="af-students-loading">
-                  <div className="af-spinner-small"></div>
-                  <span>Loading students...</span>
-                </div>
-              ) : filteredStudents.length > 0 ? (
+              {filteredStudents.length > 0 ? (
                 <div className="af-students-list">
                   {filteredStudents.map((student) => {
                     const profileUrl = getProfileImageUrl(student.profileImage);
@@ -913,7 +833,7 @@ export default function EditAssignmentPage() {
                               className="af-avatar-image"
                             />
                           ) : (
-                            student.fullName.charAt(0).toUpperCase()
+                            getInitials(student.fullName)
                           )}
                         </div>
                         <div className="af-student-info">
@@ -931,52 +851,21 @@ export default function EditAssignmentPage() {
                 </div>
               ) : (
                 <div className="af-students-empty">
-                  <svg
-                    width="48"
-                    height="48"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
                   <p>No students found in this class and section</p>
-                  <small>Please check if students are enrolled</small>
                 </div>
               )}
             </div>
           )}
 
-          <div className="af-info-box">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="16" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12.01" y2="8" />
-            </svg>
-            <span>
-              Updates will be immediately visible to students. Be careful when
-              changing the due date/time, total marks, or assigned teacher.
-            </span>
-          </div>
-
           <div className="af-assignment-info">
             <div className="af-info-item">
-              <span className="af-info-label">Created:</span>
+              <span className="af-info-label">Created</span>
               <span className="af-info-value">
                 {new Date(assignment.createdAt).toLocaleString()}
               </span>
             </div>
             <div className="af-info-item">
-              <span className="af-info-label">Status:</span>
+              <span className="af-info-label">Status</span>
               <span
                 className={`af-status-badge ${assignment.isActive ? "active" : "inactive"}`}
               >
@@ -984,23 +873,11 @@ export default function EditAssignmentPage() {
               </span>
             </div>
             <div className="af-info-item">
-              <span className="af-info-label">Submissions:</span>
+              <span className="af-info-label">Submissions</span>
               <span className="af-info-value">{submissionCount}</span>
             </div>
-            {assignment.assignedTeacher && (
-              <div className="af-info-item">
-                <span className="af-info-label">Currently Assigned:</span>
-                <span className="af-info-value">
-                  {assignment.assignedTeacher.fullName} (@
-                  {assignment.assignedTeacher.username})
-                </span>
-              </div>
-            )}
           </div>
-
-          <div className="af-required-note">
-            * Required fields | Changes are saved immediately
-          </div>
+          <div className="af-required-note">* Required fields</div>
         </div>
       </main>
     </div>

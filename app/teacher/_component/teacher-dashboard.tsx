@@ -156,9 +156,9 @@ export default function Dashboard() {
       iconColor: "#6366F1",
     },
     {
-      id: "announcement",
-      title: "Announcement",
-      description: "Latest announcements",
+      id: "notice",
+      title: "Notice",
+      description: "Latest notices",
       icon: (
         <svg
           width="28"
@@ -175,7 +175,7 @@ export default function Dashboard() {
           />
         </svg>
       ),
-      path: "/teacher/dashboard/announcement",
+      path: "/teacher/dashboard/notice",
       bgColor: "#FFEDD5",
       iconColor: "#F97316",
     },
@@ -242,7 +242,11 @@ export default function Dashboard() {
               key={item.id}
               className="dashboard-menu-card"
               onClick={() => {
-                if (item.id === "routine" || item.id === "assignment") {
+                if (
+                  item.id === "routine" ||
+                  item.id === "assignment" ||
+                  item.id === "notice"
+                ) {
                   router.push(item.path);
                 } else {
                   toast("Feature coming soon!", {
