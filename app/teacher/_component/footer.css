@@ -1,0 +1,256 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   footer.css — HamroPadhai Footer
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.hp-footer {
+  position: relative;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ─── Wave divider ─────────────────────────────────────────────────────────── */
+.hp-footer-wave {
+  color: #1e1b4b;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.hp-footer-wave svg {
+  display: block;
+  width: 100%;
+  height: 100px;
+}
+
+/* ─── Body ─────────────────────────────────────────────────────────────────── */
+.hp-footer-body {
+  background: #1e1b4b;
+  color: #c7d2fe;
+}
+
+.hp-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 40px 40px;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 60px;
+  align-items: start;
+}
+
+/* ─── Brand ────────────────────────────────────────────────────────────────── */
+.hp-footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hp-footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.hp-footer-logo-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  padding: 8px;
+}
+
+.hp-footer-logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hp-footer-logo-text {
+  height: 32px;
+  object-fit: contain;
+}
+
+.hp-footer-tagline {
+  font-size: 14px;
+  color: #a5b4fc;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 260px;
+}
+
+/* ─── Links grid ───────────────────────────────────────────────────────────── */
+.hp-footer-links-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.hp-footer-col-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #818cf8;
+  margin: 0 0 16px;
+}
+
+.hp-footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hp-footer-list a {
+  font-size: 14px;
+  color: #a5b4fc;
+  text-decoration: none;
+  transition: color 0.2s, padding-left 0.2s;
+  display: inline-block;
+}
+
+.hp-footer-list a:hover {
+  color: #fff;
+  padding-left: 4px;
+}
+
+/* ─── Contact list ─────────────────────────────────────────────────────────── */
+.hp-footer-contact li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: #a5b4fc;
+}
+
+.hp-footer-contact li svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #818cf8;
+}
+
+/* ─── Bottom bar ───────────────────────────────────────────────────────────── */
+.hp-footer-bottom {
+  border-top: 1px solid rgba(99, 102, 241, 0.2);
+  background: #17164a;
+}
+
+.hp-footer-bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hp-footer-copy {
+  margin: 0;
+  font-size: 13px;
+  color: #6366f1;
+  font-weight: 500;
+}
+
+.hp-footer-legal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.hp-footer-legal a {
+  font-size: 13px;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.hp-footer-legal a:hover {
+  color: #a5b4fc;
+}
+
+.hp-footer-dot {
+  color: #374151;
+  font-size: 13px;
+}
+
+/* ─── Tablet ───────────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hp-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 48px 32px 32px;
+  }
+
+  .hp-footer-tagline {
+    max-width: 100%;
+  }
+
+  .hp-footer-links-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .hp-footer-wave svg {
+    height: 10px;
+  }
+
+  .hp-footer-inner {
+    padding: 36px 20px 28px;
+    gap: 32px;
+  }
+
+  .hp-footer-logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .hp-footer-logo-text {
+    height: 28px;
+  }
+
+  .hp-footer-links-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  /* Contact takes full width on mobile */
+  .hp-footer-links-grid .hp-footer-col:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .hp-footer-bottom-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 20px;
+    gap: 10px;
+  }
+
+  .hp-footer-legal {
+    gap: 8px;
+  }
+
+  .hp-footer-legal a {
+    font-size: 12px;
+  }
+}
+
+/* ─── Very small mobile ────────────────────────────────────────────────────── */
+@media (max-width: 380px) {
+  .hp-footer-links-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hp-footer-links-grid .hp-footer-col:last-child {
+    grid-column: auto;
+  }
+}

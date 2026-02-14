@@ -9,6 +9,7 @@ import {
 import { getCurrentUserId } from "./../../../lib/cookie";
 import toast from "react-hot-toast";
 import "./users.css";
+import PageHeader from "./../../_components/PageHeader";
 
 interface User {
   _id: string;
@@ -121,8 +122,7 @@ export default function UsersPage() {
         <header className="users-header">
           <div className="users-header-inner">
             <div className="users-brand">
-              <div className="users-brand-logo">📚</div>
-              <span className="users-brand-title">HamroPadhai Admin</span>
+              <PageHeader />
             </div>
           </div>
         </header>
@@ -137,28 +137,7 @@ export default function UsersPage() {
   return (
     <div className="users-page">
       <header className="users-header">
-        <div className="users-header-inner">
-          <div className="users-brand">
-            <div className="users-brand-logo">📚</div>
-            <span className="users-brand-title">HamroPadhai Admin</span>
-          </div>
-          <div className="users-header-actions">
-            <button
-              className="users-btn-logout"
-              onClick={async () => {
-                const { clearAuthCookies } =
-                  await import("./../../../lib/cookie");
-                await clearAuthCookies();
-                toast.success("Logged out successfully!");
-                setTimeout(() => {
-                  router.push("/login");
-                }, 1000);
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
+        <PageHeader />
       </header>
 
       <main className="users-content">

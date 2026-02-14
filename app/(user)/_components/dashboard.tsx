@@ -6,6 +6,7 @@ import { getProfileData } from "../../../lib/actions/profile-action";
 import toast from "react-hot-toast";
 import Navbar from "../_components/Navbar";
 import "./dashboard.css";
+import Footer from "./footer";
 
 interface UserProfile {
   _id: string;
@@ -153,6 +154,7 @@ export default function Dashboard() {
       path: "/dashboard/calendar",
       bgColor: "#E0E7FF",
       iconColor: "#6366F1",
+      isActive: true,
     },
     {
       id: "notice",
@@ -244,7 +246,8 @@ export default function Dashboard() {
                 if (
                   item.id === "routine" ||
                   item.id === "assignment" ||
-                  item.id === "notice"
+                  item.id === "notice" ||
+                  item.id === "calendar"
                 ) {
                   router.push(item.path);
                 } else {
@@ -286,6 +289,7 @@ export default function Dashboard() {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

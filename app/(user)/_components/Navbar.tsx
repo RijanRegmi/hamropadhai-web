@@ -5,13 +5,12 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { handleLogout } from "../../../lib/actions/auth-action";
 import { getProfileData } from "../../../lib/actions/profile-action";
+import { getNotificationUnreadCountAction } from "../../../lib/actions/notification-action";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
-import book from "../../../assets/images/books.png";
 import HamroPadhai from "../../../assets/images/HamroPadhai.png";
 import NotificationPopup from "./NotificationPopup";
 import "./navbar.css";
-import PageHeader from "./../../_components/PageHeader";
 
 interface UserProfile {
   _id: string;
@@ -28,23 +27,31 @@ export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetchProfile();
+    fetchUnreadCount();
+    const interval = setInterval(fetchUnreadCount, 60_000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchProfile = async () => {
     try {
       const result = await getProfileData();
-      if (result.success) {
-        setProfile(result.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch profile");
-    }
+      if (result.success) setProfile(result.data);
+    } catch {}
+  };
+
+  const fetchUnreadCount = async () => {
+    try {
+      const result = await getNotificationUnreadCountAction();
+      if (result.success) setUnreadCount(result.data?.unreadCount || 0);
+    } catch {}
   };
 
   const onLogout = async () => {
@@ -70,15 +77,11 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname === path;
 
-  // Unread count - you can make this dynamic later
-  const unreadCount = 3;
-
   return (
     <>
-      {/* Desktop & Tablet Navbar */}
+      {/* ── Desktop Navbar ── */}
       <header className="navbar desktop-navbar">
         <div className="navbar-container">
-          {/* Logo Section */}
           <div
             className="navbar-brand"
             onClick={() => router.push("/dashboard")}
@@ -86,9 +89,7 @@ export default function Navbar() {
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
 
-          {/* Actions Section */}
           <div className="navbar-actions">
-            {/* Notification Button */}
             <button
               className="navbar-notification-btn"
               onClick={() => setShowNotifications(!showNotifications)}
@@ -108,11 +109,12 @@ export default function Navbar() {
                 />
               </svg>
               {unreadCount > 0 && (
-                <span className="notification-badge">{unreadCount}</span>
+                <span className="notification-badge">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
               )}
             </button>
 
-            {/* Desktop Profile Dropdown */}
             <div className="navbar-profile-wrapper">
               <button
                 className="navbar-profile-btn"
@@ -161,7 +163,6 @@ export default function Navbar() {
                 </svg>
               </button>
 
-              {/* Dropdown Menu */}
               {showProfileMenu && (
                 <div className="navbar-dropdown-menu">
                   <button
@@ -187,7 +188,6 @@ export default function Navbar() {
                     </svg>
                     View Profile
                   </button>
-
                   <button
                     className="navbar-dropdown-item"
                     onClick={() => {
@@ -220,9 +220,7 @@ export default function Navbar() {
                     </svg>
                     Settings
                   </button>
-
-                  <div className="navbar-dropdown-divider"></div>
-
+                  <div className="navbar-dropdown-divider" />
                   <button
                     className="navbar-dropdown-item logout"
                     onClick={onLogout}
@@ -249,17 +247,15 @@ export default function Navbar() {
             </div>
           </div>
         </div>
-
-        {/* Click outside to close dropdown */}
         {showProfileMenu && (
           <div
             className="navbar-overlay"
             onClick={() => setShowProfileMenu(false)}
-          ></div>
+          />
         )}
       </header>
 
-      {/* Mobile Top Header - Logo Only */}
+      {/* ── Mobile Top Header ── */}
       <header className="mobile-top-header">
         <div className="mobile-header-container">
           <button className="mobile-back-btn" onClick={() => router.back()}>
@@ -278,15 +274,12 @@ export default function Navbar() {
               />
             </svg>
           </button>
-
           <div
             className="mobile-header-brand"
             onClick={() => router.push("/dashboard")}
           >
             <Image src={HamroPadhai} alt="HamroPadhai" />
           </div>
-
-          {/* Notification Button - Mobile */}
           <button
             className="mobile-notification-btn"
             onClick={() => setShowNotifications(!showNotifications)}
@@ -306,13 +299,15 @@ export default function Navbar() {
               />
             </svg>
             {unreadCount > 0 && (
-              <span className="mobile-notification-badge">{unreadCount}</span>
+              <span className="mobile-notification-badge">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
             )}
           </button>
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation */}
+      {/* ── Mobile Bottom Nav ── */}
       <nav className="mobile-bottom-nav">
         <button
           className={`mobile-nav-item ${isActive("/dashboard") ? "active" : ""}`}
@@ -334,15 +329,9 @@ export default function Navbar() {
           </svg>
           <span>Home</span>
         </button>
-
         <button
-          className="mobile-nav-item"
-          onClick={() => {
-            toast("Feature coming soon!", {
-              icon: "🚀",
-              style: { background: "#3b82f6", color: "#fff" },
-            });
-          }}
+          className={`mobile-nav-item ${isActive("/dashboard/calendar") ? "active" : ""}`}
+          onClick={() => router.push("/dashboard/calendar")}
         >
           <svg
             width="24"
@@ -355,12 +344,11 @@ export default function Navbar() {
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <span>Notes</span>
+          <span>Calendar</span>
         </button>
-
         <button
           className={`mobile-nav-item ${isActive("/dashboard/profile") ? "active" : ""}`}
           onClick={() => router.push("/dashboard/profile")}
@@ -387,10 +375,12 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Notification Popup Component */}
+      {/* ── Notification Popup ── role="user" for correct redirect URLs ── */}
       <NotificationPopup
         isOpen={showNotifications}
         onClose={() => setShowNotifications(false)}
+        onUnreadChange={(count) => setUnreadCount(count)}
+        role="user"
       />
     </>
   );

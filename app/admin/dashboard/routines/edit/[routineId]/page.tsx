@@ -6,10 +6,7 @@ import {
   getRoutineByIdAction,
   updateRoutineAction,
 } from "../../../../../../lib/actions/routine-action";
-import {
-  getAllUsersAction,
-  getFilteredTeachersAction,
-} from "../../../../../../lib/actions/admin-action";
+import { getFilteredTeachersAction } from "../../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
 import "./routine-edit.css";
 import PageHeader from "./../../../../../_components/PageHeader";
@@ -47,11 +44,6 @@ const DAYS = [
   "Friday",
   "Saturday",
 ];
-
-const CLASSES = ["11", "12"];
-const SECTIONS = ["A", "B", "C", "D", "E"];
-
-// Subject list matching the assignment page
 const SUBJECTS = [
   "Mathematics",
   "Physics",
@@ -64,7 +56,6 @@ const SUBJECTS = [
   "Economics",
   "Business Studies",
 ];
-
 const ROOMS = [
   "101",
   "102",
@@ -81,92 +72,52 @@ const ROOMS = [
 export default function EditRoutinePage() {
   const router = useRouter();
   const params = useParams();
-
-  console.log("=== PARAMS DEBUG ===");
-  console.log("Full params object:", params);
-  console.log("params keys:", params ? Object.keys(params) : "null");
-
   const routineId = (params?.id ||
     params?.routineId ||
     params?.["[id]"]) as string;
 
-  console.log("Extracted routine ID:", routineId);
-
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [allTeachers, setAllTeachers] = useState<Teacher[]>([]);
   const [filteredTeachers, setFilteredTeachers] = useState<Teacher[]>([]);
-  const [isLoadingTeachers, setIsLoadingTeachers] = useState(true);
 
+  // ── These are READ-ONLY after load — disabled in the form ─────────────────
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
-  const [academicYear, setAcademicYear] = useState("2024-2025");
+  const [academicYear, setAcademicYear] = useState("");
 
   const [entries, setEntries] = useState<DayEntry[]>([]);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("=== EDIT PAGE MOUNTED ===");
-    console.log("Routine ID from params:", routineId);
-
     if (routineId && routineId !== "undefined" && routineId !== "null") {
       fetchRoutine();
     } else {
-      console.error("❌ No routine ID found in params");
-      console.error("params object:", JSON.stringify(params, null, 2));
       toast.error("Invalid routine ID");
-      setTimeout(() => {
-        if (!routineId) {
-          router.push("/admin/dashboard/routines");
-        }
-      }, 1000);
+      router.push("/admin/dashboard/routines");
     }
   }, [routineId]);
 
+  // Fetch teachers once classId + sectionId are loaded from the routine
   useEffect(() => {
-    fetchTeachers();
-  }, []);
-
-  useEffect(() => {
-    if (classId && sectionId) {
-      console.log("Fetching filtered teachers for:", { classId, sectionId });
-      fetchFilteredTeachers();
-    } else {
-      setFilteredTeachers([]);
-    }
+    if (classId && sectionId) fetchFilteredTeachers();
   }, [classId, sectionId]);
 
   const fetchRoutine = async () => {
-    console.log("=== FETCHING ROUTINE ===");
-    console.log("Routine ID:", routineId);
-
     try {
       setIsLoading(true);
       const result = await getRoutineByIdAction(routineId);
-
-      console.log("Fetch routine result:", result);
-
-      if (!result.success) {
-        console.error("❌ Failed to fetch routine:", result.message);
+      if (!result.success || !result.data) {
         toast.error(result.message || "Failed to load routine");
         router.push("/admin/dashboard/routines");
         return;
       }
 
-      if (!result.data) {
-        console.error("❌ No data in result");
-        toast.error("Routine data is missing");
-        router.push("/admin/dashboard/routines");
-        return;
-      }
-
       const routine = result.data;
-      console.log("✓ Routine loaded:", routine);
-
       setClassId(routine.classId || "");
       setSectionId(routine.sectionId || "");
       setAcademicYear(routine.academicYear || "2024-2025");
 
+      // All existing periods start as confirmed
       const entriesWithConfirmed = (routine.entries || []).map(
         (entry: any) => ({
           day: entry.day,
@@ -182,165 +133,108 @@ export default function EditRoutinePage() {
           })),
         }),
       );
-
-      console.log("✓ Entries with confirmed flag:", entriesWithConfirmed);
       setEntries(entriesWithConfirmed);
-
-      console.log("✓ State updated successfully");
     } catch (error: any) {
-      console.error("=== FETCH ROUTINE ERROR ===");
-      console.error(error);
       toast.error("Failed to load routine");
       router.push("/admin/dashboard/routines");
     } finally {
-      console.log("✓ Setting isLoading to false");
       setIsLoading(false);
-    }
-  };
-
-  const fetchTeachers = async () => {
-    try {
-      setIsLoadingTeachers(true);
-      const result = await getAllUsersAction();
-
-      if (result.success) {
-        const teacherUsers = result.data.filter(
-          (user: any) => user.role === "teacher",
-        );
-        setAllTeachers(teacherUsers);
-      }
-    } catch (error) {
-      console.error("Error fetching teachers:", error);
-      toast.error("Failed to load teachers");
-    } finally {
-      setIsLoadingTeachers(false);
     }
   };
 
   const fetchFilteredTeachers = async () => {
     try {
-      setIsLoadingTeachers(true);
       const result = await getFilteredTeachersAction(classId, sectionId);
-
-      if (result.success) {
-        console.log("Filtered teachers:", result.data);
-        setFilteredTeachers(result.data);
-      } else {
-        setFilteredTeachers([]);
-      }
-    } catch (error) {
-      console.error("Error fetching filtered teachers:", error);
-      setFilteredTeachers([]);
-    } finally {
-      setIsLoadingTeachers(false);
-    }
+      if (result.success) setFilteredTeachers(result.data);
+    } catch {}
   };
 
+  // ── Day management ─────────────────────────────────────────────────────────
   const addDay = () => {
     if (!selectedDay) {
       toast.error("Please select a day");
       return;
     }
-
     if (entries.some((e) => e.day === selectedDay)) {
-      toast.error("This day is already added");
+      toast.error("Day already added");
       return;
     }
-
-    setEntries([
-      ...entries,
-      {
-        day: selectedDay,
-        periods: [],
-      },
-    ]);
+    setEntries([...entries, { day: selectedDay, periods: [] }]);
     setSelectedDay(null);
   };
 
-  const removeDay = (day: string) => {
+  const removeDay = (day: string) =>
     setEntries(entries.filter((e) => e.day !== day));
-  };
 
+  // ── Period management ──────────────────────────────────────────────────────
   const addPeriod = (day: string) => {
     setEntries(
       entries.map((entry) => {
-        if (entry.day === day) {
-          const nextPeriodNumber = entry.periods.length + 1;
-          return {
-            ...entry,
-            periods: [
-              ...entry.periods,
-              {
-                periodNumber: nextPeriodNumber,
-                startTime: "",
-                endTime: "",
-                subject: "",
-                teacherId: null,
-                teacherName: "",
-                roomNumber: "",
-                isConfirmed: false,
-              },
-            ],
-          };
-        }
-        return entry;
+        if (entry.day !== day) return entry;
+        return {
+          ...entry,
+          periods: [
+            ...entry.periods,
+            {
+              periodNumber: entry.periods.length + 1,
+              startTime: "",
+              endTime: "",
+              subject: "",
+              teacherId: null,
+              teacherName: "",
+              roomNumber: "",
+              isConfirmed: false,
+            },
+          ],
+        };
       }),
     );
   };
 
-  const removePeriod = (day: string, periodIndex: number) => {
+  const removePeriod = (day: string, idx: number) => {
     setEntries(
       entries.map((entry) => {
-        if (entry.day === day) {
-          const newPeriods = entry.periods.filter((_, i) => i !== periodIndex);
-          return {
-            ...entry,
-            periods: newPeriods.map((p, i) => ({ ...p, periodNumber: i + 1 })),
-          };
-        }
-        return entry;
+        if (entry.day !== day) return entry;
+        const newPeriods = entry.periods.filter((_, i) => i !== idx);
+        return {
+          ...entry,
+          periods: newPeriods.map((p, i) => ({ ...p, periodNumber: i + 1 })),
+        };
       }),
     );
   };
 
   const updatePeriod = (
     day: string,
-    periodIndex: number,
+    idx: number,
     field: keyof Period,
     value: any,
   ) => {
     setEntries(
       entries.map((entry) => {
-        if (entry.day === day) {
-          return {
-            ...entry,
-            periods: entry.periods.map((period, i) => {
-              if (i === periodIndex) {
-                if (field === "teacherId") {
-                  const teacher = filteredTeachers.find((t) => t._id === value);
-                  return {
-                    ...period,
-                    teacherId: value || null,
-                    teacherName: teacher ? teacher.fullName : "",
-                  };
-                }
-                return { ...period, [field]: value };
-              }
-              return period;
-            }),
-          };
-        }
-        return entry;
+        if (entry.day !== day) return entry;
+        return {
+          ...entry,
+          periods: entry.periods.map((period, i) => {
+            if (i !== idx) return period;
+            if (field === "teacherId") {
+              const teacher = filteredTeachers.find((t) => t._id === value);
+              return {
+                ...period,
+                teacherId: value || null,
+                teacherName: teacher?.fullName || "",
+              };
+            }
+            return { ...period, [field]: value };
+          }),
+        };
       }),
     );
   };
 
-  const confirmPeriod = (day: string, periodIndex: number) => {
-    const entry = entries.find((e) => e.day === day);
-    if (!entry) return;
-
-    const period = entry.periods[periodIndex];
-
+  const confirmPeriod = (day: string, idx: number) => {
+    const period = entries.find((e) => e.day === day)?.periods[idx];
+    if (!period) return;
     if (
       !period.startTime ||
       !period.endTime ||
@@ -350,55 +244,38 @@ export default function EditRoutinePage() {
       toast.error("Please fill all required fields before confirming");
       return;
     }
-
     setEntries(
       entries.map((entry) => {
-        if (entry.day === day) {
-          return {
-            ...entry,
-            periods: entry.periods.map((p, i) => {
-              if (i === periodIndex) {
-                return { ...p, isConfirmed: true };
-              }
-              return p;
-            }),
-          };
-        }
-        return entry;
+        if (entry.day !== day) return entry;
+        return {
+          ...entry,
+          periods: entry.periods.map((p, i) =>
+            i === idx ? { ...p, isConfirmed: true } : p,
+          ),
+        };
       }),
     );
-
     toast.success(`Period ${period.periodNumber} confirmed!`);
   };
 
-  const editPeriod = (day: string, periodIndex: number) => {
+  const editPeriod = (day: string, idx: number) => {
     setEntries(
       entries.map((entry) => {
-        if (entry.day === day) {
-          return {
-            ...entry,
-            periods: entry.periods.map((p, i) => {
-              if (i === periodIndex) {
-                return { ...p, isConfirmed: false };
-              }
-              return p;
-            }),
-          };
-        }
-        return entry;
+        if (entry.day !== day) return entry;
+        return {
+          ...entry,
+          periods: entry.periods.map((p, i) =>
+            i === idx ? { ...p, isConfirmed: false } : p,
+          ),
+        };
       }),
     );
   };
 
+  // ── Submit ─────────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
     try {
       setIsSaving(true);
-
-      if (!classId || !sectionId || !academicYear) {
-        toast.error("Please fill in class, section, and academic year");
-        return;
-      }
-
       if (entries.length === 0) {
         toast.error("Please add at least one day");
         return;
@@ -409,11 +286,10 @@ export default function EditRoutinePage() {
           toast.error(`Please add periods for ${entry.day}`);
           return;
         }
-
         for (const period of entry.periods) {
           if (!period.isConfirmed) {
             toast.error(
-              `Please confirm all periods. ${entry.day} Period ${period.periodNumber} is not confirmed.`,
+              `Confirm all periods first. ${entry.day} Period ${period.periodNumber} is not confirmed.`,
             );
             return;
           }
@@ -433,35 +309,20 @@ export default function EditRoutinePage() {
         })),
       }));
 
-      console.log("=== SUBMITTING UPDATE ===");
-      console.log("Routine ID:", routineId);
-      console.log("Update data:", {
-        classId,
-        sectionId,
-        academicYear,
-        entries: cleanedEntries,
-      });
-
       const result = await updateRoutineAction(routineId, {
         classId,
         sectionId,
         academicYear,
         entries: cleanedEntries,
       });
-
-      console.log("Update result:", result);
-
       if (!result.success) {
         toast.error(result.message || "Failed to update routine");
         return;
       }
 
-      toast.success(result.message || "Routine updated successfully!");
-      setTimeout(() => {
-        router.push("/admin/dashboard/routines");
-      }, 1000);
+      toast.success("Routine updated successfully!");
+      setTimeout(() => router.push("/admin/dashboard/routines"), 1000);
     } catch (error: any) {
-      console.error("Error updating routine:", error);
       toast.error(error.message || "Failed to update routine");
     } finally {
       setIsSaving(false);
@@ -472,11 +333,8 @@ export default function EditRoutinePage() {
     return (
       <div className="rf-page">
         <div className="rf-loading">
-          <div className="rf-spinner"></div>
+          <div className="rf-spinner" />
           <p>Loading routine...</p>
-          <p style={{ fontSize: "12px", marginTop: "10px", color: "#666" }}>
-            Routine ID: {routineId || "Not found"}
-          </p>
         </div>
       </div>
     );
@@ -502,8 +360,8 @@ export default function EditRoutinePage() {
       <main className="rf-content">
         <div className="rf-card">
           <button
-            className={`back-btn`}
-            onClick={() => router.push(`/admin/dashboard/routines/`)}
+            className="back-btn"
+            onClick={() => router.push("/admin/dashboard/routines/")}
           >
             <svg
               width="20"
@@ -517,53 +375,63 @@ export default function EditRoutinePage() {
             </svg>
             <span className="back-btn-text">Back</span>
           </button>
+
           <h2 className="rf-card-title">Edit Class Routine</h2>
           <p className="rf-card-sub">Update the routine details</p>
 
+          {/* ── Class/Section/Year — READ ONLY ── */}
           <div className="rf-form-grid">
             <div className="rf-field">
-              <label className="rf-label">Class *</label>
-              <select
-                className="rf-input rf-select"
-                value={classId}
-                onChange={(e) => setClassId(e.target.value)}
-              >
-                <option value="">Select Class</option>
-                {CLASSES.map((cls) => (
-                  <option key={cls} value={cls}>
-                    Class {cls}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="rf-field">
-              <label className="rf-label">Section *</label>
-              <select
-                className="rf-input rf-select"
-                value={sectionId}
-                onChange={(e) => setSectionId(e.target.value)}
-              >
-                <option value="">Select Section</option>
-                {SECTIONS.map((sec) => (
-                  <option key={sec} value={sec}>
-                    Section {sec}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="rf-field">
-              <label className="rf-label">Academic Year *</label>
+              <label className="rf-label">Class</label>
               <input
-                className="rf-input"
+                className="rf-input rf-input-disabled"
+                value={`Class ${classId}`}
+                disabled
+                readOnly
+              />
+            </div>
+            <div className="rf-field">
+              <label className="rf-label">Section</label>
+              <input
+                className="rf-input rf-input-disabled"
+                value={`Section ${sectionId}`}
+                disabled
+                readOnly
+              />
+            </div>
+            <div className="rf-field">
+              <label className="rf-label">Academic Year</label>
+              <input
+                className="rf-input rf-input-disabled"
                 value={academicYear}
-                onChange={(e) => setAcademicYear(e.target.value)}
-                placeholder="2024-2025"
+                disabled
+                readOnly
               />
             </div>
           </div>
 
+          {/* ── Read-only info notice ── */}
+          <div className="rf-readonly-notice">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="10" strokeWidth="2" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4m0 4h.01"
+              />
+            </svg>
+            Class, Section and Academic Year cannot be changed when editing.
+            Create a new routine to change these.
+          </div>
+
+          {/* ── Teacher info ── */}
           <div className="rf-teacher-info">
             <p>
               {filteredTeachers.length} teacher(s) available for Class {classId}{" "}
@@ -576,6 +444,7 @@ export default function EditRoutinePage() {
             </p>
           </div>
 
+          {/* ── Add Day ── */}
           <div className="rf-add-day-section">
             <h3 className="rf-section-title">Days & Periods</h3>
             <div className="rf-add-day-box">
@@ -609,6 +478,7 @@ export default function EditRoutinePage() {
             </div>
           </div>
 
+          {/* ── Days List ── */}
           <div className="rf-days-list">
             {entries.map((entry) => (
               <div key={entry.day} className="rf-day-card">
@@ -741,13 +611,14 @@ export default function EditRoutinePage() {
                                 }
                               >
                                 <option value="">Select Subject *</option>
-                                {SUBJECTS.map((subject) => (
-                                  <option key={subject} value={subject}>
-                                    {subject}
+                                {SUBJECTS.map((s) => (
+                                  <option key={s} value={s}>
+                                    {s}
                                   </option>
                                 ))}
                               </select>
 
+                              {/* ── Teacher dropdown: only teachers assigned to this class/section ── */}
                               <select
                                 className="rf-input rf-input-sm rf-select"
                                 value={period.teacherId || ""}
@@ -780,15 +651,14 @@ export default function EditRoutinePage() {
                                   )
                                 }
                               >
-                                <option value="">Select room *</option>
-                                {ROOMS.map((room) => (
-                                  <option key={room} value={room}>
-                                    {room}
+                                <option value="">Select Room</option>
+                                {ROOMS.map((r) => (
+                                  <option key={r} value={r}>
+                                    {r}
                                   </option>
                                 ))}
                               </select>
                             </div>
-
                             <div className="rf-period-confirm-section">
                               <button
                                 className="rf-btn-confirm-period"

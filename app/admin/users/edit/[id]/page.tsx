@@ -9,7 +9,7 @@ import {
 } from "../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
 import "./user-form.css";
-
+import PageHeader from "./../../../../_components/PageHeader";
 const CLASSES = ["11", "12"];
 const SECTIONS = ["A", "B", "C", "D", "E"];
 
@@ -354,12 +354,7 @@ export default function EditUserPage() {
     return (
       <div className="uf-page">
         <header className="uf-header">
-          <div className="uf-header-inner">
-            <div className="uf-brand">
-              <div className="uf-brand-logo">📚</div>
-              <span className="uf-brand-title">HamroPadhai Admin</span>
-            </div>
-          </div>
+          <PageHeader />
         </header>
         <div className="uf-loading">
           <div className="uf-spinner"></div>
@@ -383,8 +378,7 @@ export default function EditUserPage() {
       <header className="uf-header">
         <div className="uf-header-inner">
           <div className="uf-brand">
-            <div className="uf-brand-logo">📚</div>
-            <span className="uf-brand-title">HamroPadhai Admin</span>
+            <PageHeader />
           </div>
           <div className="uf-header-actions">
             <button

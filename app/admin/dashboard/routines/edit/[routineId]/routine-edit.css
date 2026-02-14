@@ -96,8 +96,6 @@
   cursor: not-allowed;
 }
 
-
-
 .back-btn {
   display: flex;
   align-items: center;
@@ -214,6 +212,60 @@
 }
 .rf-select:disabled {
   cursor: not-allowed;
+}
+
+/* ─── Disabled / Read-only fields (Edit page) ─────────────────────────── */
+.rf-input-disabled {
+  background: #f3f4f6 !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+  border-color: #e5e7eb !important;
+  opacity: 1 !important;
+}
+
+/* ─── Read-only notice banner (Edit page) ──────────────────────────────── */
+.rf-readonly-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  color: #1d4ed8;
+  font-size: 13px;
+  margin-top: 4px;
+  margin-bottom: 20px;
+}
+
+.rf-readonly-notice svg {
+  flex-shrink: 0;
+  color: #3b82f6;
+}
+
+/* ─── Loading state ────────────────────────────────────────────────────── */
+.rf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 16px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.rf-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: rfSpin 0.8s linear infinite;
+}
+
+@keyframes rfSpin {
+  to { transform: rotate(360deg); }
 }
 
 /* ─── Confirmation Section ─────────────────────────────────────────────── */

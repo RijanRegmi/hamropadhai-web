@@ -6,6 +6,7 @@ import { getProfileData } from "../../../lib/actions/profile-action";
 import toast from "react-hot-toast";
 import Navbar from "./Navbar";
 import "./dashboard.css";
+import Footer from "./footer";
 
 interface UserProfile {
   _id: string;
@@ -26,7 +27,7 @@ interface MenuItem {
   path: string;
   bgColor: string;
   iconColor: string;
-  isActive?: boolean; // Flag to indicate if route is active
+  isActive?: boolean;
 }
 
 export default function Dashboard() {
@@ -85,7 +86,7 @@ export default function Dashboard() {
     {
       id: "assignment",
       title: "Assignment",
-      description: "Check your assignments",
+      description: "Manage assignments",
       icon: (
         <svg
           width="28"
@@ -227,10 +228,10 @@ export default function Dashboard() {
         <div className="dashboard-welcome-section">
           <div className="welcome-content">
             <h1 className="welcome-title">
-              Welcome back, {profile?.fullName || "Student"}!
+              Welcome back, {profile?.fullName || "Teacher"}!
             </h1>
             <p className="welcome-subtitle">
-              Here's what's happening with your studies today.
+              Here's what's happening with your classes today.
             </p>
           </div>
         </div>
@@ -245,7 +246,8 @@ export default function Dashboard() {
                 if (
                   item.id === "routine" ||
                   item.id === "assignment" ||
-                  item.id === "notice"
+                  item.id === "notice" ||
+                  item.id === "calendar"
                 ) {
                   router.push(item.path);
                 } else {
@@ -287,6 +289,9 @@ export default function Dashboard() {
           ))}
         </div>
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

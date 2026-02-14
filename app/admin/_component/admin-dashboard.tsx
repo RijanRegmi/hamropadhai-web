@@ -6,6 +6,7 @@ import { getProfileData } from "../../../lib/actions/profile-action";
 import toast from "react-hot-toast";
 import Navbar from "./Navbar";
 import "./dashboard.css";
+import Footer from "./footer";
 
 interface UserProfile {
   _id: string;
@@ -238,9 +239,7 @@ export default function Dashboard() {
     <div className="dashboard-page">
       <Navbar />
 
-      {/* Main Content */}
       <main className="dashboard-content">
-        {/* Welcome Section - Now visible on mobile too */}
         <div className="dashboard-welcome-section">
           <div className="welcome-content">
             <h1 className="welcome-title">
@@ -291,6 +290,7 @@ export default function Dashboard() {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
