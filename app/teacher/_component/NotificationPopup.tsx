@@ -184,7 +184,7 @@ function getRedirectUrl(n: NotificationItem, role: string): string | null {
     return `/teacher/dashboard/assignments`;
   }
   if (n.refModel === "Routine") return `/teacher/dashboard/routine`;
-  if (n.refModel === "Notice") return `/teacher/dashboard/notices`;
+  if (n.refModel === "Notice") return `/teacher/dashboard/notice`;
   return null;
 }
 

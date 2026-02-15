@@ -8,21 +8,15 @@ const API_URL =
 /* =========================
    HELPER FUNCTION
 ========================= */
-// Helper to check if teacher teaches a class/section
-// NEW VERSION - handles new format
 function teacherTeachesClassSection(teacher: any, targetClassId: string, targetSectionId: string): boolean {
   if (!teacher.classId) return false;
 
   try {
-    // NEW: Parse class-section pairs like:
-    // [{"classId":"11","sections":["A","B"]},{"classId":"12","sections":["D"]}]
     let classSectionPairs: Array<{classId: string, sections: string[]}> = [];
     
     if (teacher.classId.startsWith('[{')) {
-      // New format: class-section pairs
       classSectionPairs = JSON.parse(teacher.classId);
     } else if (teacher.classId.startsWith('[')) {
-      // Legacy format: separate class and section arrays
       const teacherClasses = JSON.parse(teacher.classId);
       const teacherSections = teacher.sectionId ? JSON.parse(teacher.sectionId) : [];
       classSectionPairs = teacherClasses.map((cls: string) => ({
@@ -30,19 +24,15 @@ function teacherTeachesClassSection(teacher: any, targetClassId: string, targetS
         sections: teacherSections
       }));
     } else {
-      // Single value format
       classSectionPairs = [{
         classId: teacher.classId,
         sections: teacher.sectionId ? [teacher.sectionId] : []
       }];
     }
 
-    // Check if any pair matches the target class and section
-    const matches = classSectionPairs.some(pair => 
+    return classSectionPairs.some(pair => 
       pair.classId === targetClassId && pair.sections.includes(targetSectionId)
     );
-
-    return matches;
   } catch (error) {
     console.error('Error parsing teacher class/section:', error);
     return false;
@@ -58,10 +48,7 @@ export async function getAllUsersAction() {
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
     const response = await fetch(`${API_URL}/api/admin/users`, {
@@ -70,7 +57,7 @@ export async function getAllUsersAction() {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      cache: "no-store", // Ensure fresh data
+      cache: "no-store",
     });
 
     const result = await response.json();
@@ -87,25 +74,18 @@ export async function getAllUsersAction() {
     });
 
     if (!response.ok || !result.success) {
-      return {
-        success: false,
-        message: result.message || "Unable to load users. Please try again.",
-      };
+      return { success: false, message: result.message || "Unable to load users. Please try again." };
     }
 
     return { success: true, data: result.data };
   } catch (error: any) {
     console.error("getAllUsersAction error:", error);
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
 /* =========================
    GET FILTERED TEACHERS
-   This filters teachers on the server side
 ========================= */
 export async function getFilteredTeachersAction(classId: string, sectionId: string) {
   try {
@@ -113,10 +93,7 @@ export async function getFilteredTeachersAction(classId: string, sectionId: stri
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
     const response = await fetch(`${API_URL}/api/admin/users`, {
@@ -131,21 +108,16 @@ export async function getFilteredTeachersAction(classId: string, sectionId: stri
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      return {
-        success: false,
-        message: result.message || "Unable to load teachers.",
-      };
+      return { success: false, message: result.message || "Unable to load teachers." };
     }
 
-    // Filter teachers
     const allTeachers = result.data.filter((user: any) => user.role === "teacher");
     const filteredTeachers = allTeachers.filter((teacher: any) => 
       teacherTeachesClassSection(teacher, classId, sectionId)
     );
 
     console.log('Filtered teachers:', {
-      classId,
-      sectionId,
+      classId, sectionId,
       totalTeachers: allTeachers.length,
       filteredCount: filteredTeachers.length,
       filtered: filteredTeachers.map((t: any) => t.fullName)
@@ -154,27 +126,20 @@ export async function getFilteredTeachersAction(classId: string, sectionId: stri
     return { success: true, data: filteredTeachers };
   } catch (error: any) {
     console.error("getFilteredTeachersAction error:", error);
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
-/* ====================================
-   GET FILTERED STUDENTS (NEW!)
-   For assignment creation - gets students in specific class/section
-==================================== */
+/* =========================
+   GET FILTERED STUDENTS
+========================= */
 export async function getFilteredStudentsAction(classId: string, sectionId: string) {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
     console.log("🔍 Fetching students for Class:", classId, "Section:", sectionId);
@@ -191,24 +156,17 @@ export async function getFilteredStudentsAction(classId: string, sectionId: stri
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      return {
-        success: false,
-        message: result.message || "Unable to load students.",
-      };
+      return { success: false, message: result.message || "Unable to load students." };
     }
 
-    // Filter for role "user" (students)
     const allStudents = result.data.filter((user: any) => user.role === "user");
     console.log("📚 Total students in database:", allStudents.length);
     
-    // Log all students with their class/section for debugging
-    console.log("📚 All students:");
     allStudents.forEach((s: any) => {
       console.log(`  - ${s.fullName}: Class="${s.classId}", Section="${s.sectionId}"`);
     });
 
     const filteredStudents = allStudents.filter((student: any) => {
-      // Trim whitespace and do exact comparison
       const studentClass = String(student.classId || "").trim();
       const studentSection = String(student.sectionId || "").trim();
       const targetClass = String(classId).trim();
@@ -219,12 +177,8 @@ export async function getFilteredStudentsAction(classId: string, sectionId: stri
       
       if (classMatch || sectionMatch) {
         console.log(`🔎 Checking ${student.fullName}:`, {
-          studentClass: `"${studentClass}"`,
-          targetClass: `"${targetClass}"`,
-          classMatch,
-          studentSection: `"${studentSection}"`,
-          targetSection: `"${targetSection}"`,
-          sectionMatch,
+          studentClass: `"${studentClass}"`, targetClass: `"${targetClass}"`, classMatch,
+          studentSection: `"${studentSection}"`, targetSection: `"${targetSection}"`, sectionMatch,
           MATCH: classMatch && sectionMatch
         });
       }
@@ -242,10 +196,7 @@ export async function getFilteredStudentsAction(classId: string, sectionId: stri
     return { success: true, data: filteredStudents };
   } catch (error: any) {
     console.error("❌ getFilteredStudentsAction error:", error);
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
@@ -258,39 +209,27 @@ export async function getUserByIdAction(userId: string) {
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
-    const response = await fetch(
-      `${API_URL}/api/admin/users/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }
-    );
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      return {
-        success: false,
-        message: result.message || "Unable to load user details. Please try again.",
-      };
+      return { success: false, message: result.message || "Unable to load user details. Please try again." };
     }
 
     return { success: true, data: result.data };
   } catch (error: any) {
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
@@ -319,10 +258,7 @@ export async function createUserAction(
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
     const formData = new FormData();
@@ -333,8 +269,6 @@ export async function createUserAction(
     formData.append("password", data.password);
     formData.append("gender", data.gender);
     formData.append("role", data.role);
-    
-    // Always append these fields, even if empty
     formData.append("about", data.about || "");
     formData.append("classId", data.classId || "");
     formData.append("sectionId", data.sectionId || "");
@@ -344,63 +278,36 @@ export async function createUserAction(
     if (profileImage) formData.append("profileImage", profileImage);
 
     console.log("Creating user with data:", {
-      fullName: data.fullName,
-      role: data.role,
-      classId: data.classId,
-      sectionId: data.sectionId,
+      fullName: data.fullName, role: data.role,
+      classId: data.classId, sectionId: data.sectionId,
     });
 
     const response = await fetch(`${API_URL}/api/admin/users`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
       body: formData,
     });
 
     const result = await response.json();
 
-    console.log("Create user response:", {
-      status: response.status,
-      success: result.success,
-      data: result.data,
-    });
+    console.log("Create user response:", { status: response.status, success: result.success, data: result.data });
 
     if (!response.ok || !result.success) {
-      if (response.status === 409) {
-        return {
-          success: false,
-          message: "Username or email already exists. Please use different credentials.",
-        };
-      }
-      if (response.status === 400) {
-        return {
-          success: false,
-          message: result.message || "Invalid data provided. Please check all fields.",
-        };
-      }
-      return {
-        success: false,
-        message: result.message || "Failed to create user. Please try again.",
-      };
+      if (response.status === 409) return { success: false, message: "Username or email already exists. Please use different credentials." };
+      if (response.status === 400) return { success: false, message: result.message || "Invalid data provided. Please check all fields." };
+      return { success: false, message: result.message || "Failed to create user. Please try again." };
     }
 
-    return { 
-      success: true, 
-      message: `User "${data.fullName}" created successfully!`,
-      data: result.data 
-    };
+    return { success: true, message: `User "${data.fullName}" created successfully!`, data: result.data };
   } catch (error: any) {
     console.error("Create user error:", error);
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
 /* =========================
-   UPDATE USER
+   UPDATE USER (no image)
+   Used when only updating text fields
 ========================= */
 export async function updateUserAction(
   userId: string,
@@ -424,73 +331,103 @@ export async function updateUserAction(
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
-    console.log("Updating user with data:", {
-      userId,
-      classId: data.classId,
-      sectionId: data.sectionId,
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     });
-
-    const response = await fetch(
-      `${API_URL}/api/admin/users/${userId}`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
 
     const result = await response.json();
 
-    console.log("Update user response:", {
-      status: response.status,
-      success: result.success,
-    });
-
     if (!response.ok || !result.success) {
-      if (response.status === 404) {
-        return {
-          success: false,
-          message: "User not found. They may have been deleted.",
-        };
-      }
-      if (response.status === 409) {
-        return {
-          success: false,
-          message: "Username or email already taken. Please use different credentials.",
-        };
-      }
-      if (response.status === 400) {
-        return {
-          success: false,
-          message: result.message || "Invalid data provided. Please check all fields.",
-        };
-      }
-      return {
-        success: false,
-        message: result.message || "Failed to update user. Please try again.",
-      };
+      if (response.status === 404) return { success: false, message: "User not found. They may have been deleted." };
+      if (response.status === 409) return { success: false, message: "Username or email already taken. Please use different credentials." };
+      if (response.status === 400) return { success: false, message: result.message || "Invalid data provided. Please check all fields." };
+      return { success: false, message: result.message || "Failed to update user. Please try again." };
     }
 
-    return { 
-      success: true, 
-      message: "User updated successfully!",
-      data: result.data 
-    };
+    return { success: true, message: "User updated successfully!", data: result.data };
   } catch (error: any) {
     console.error("Update user error:", error);
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
+  }
+}
+
+/* ==============================
+   UPDATE USER WITH IMAGE  ← NEW
+   Sends image + fields together as multipart/form-data
+   to PUT /api/admin/users/:id which has multer middleware
+============================== */
+export async function updateUserWithImageAction(
+  userId: string,
+  data: {
+    fullName?: string;
+    username?: string;
+    email?: string;
+    phone?: string;
+    password?: string;
+    gender?: string;
+    role?: string;
+    about?: string;
+    classId?: string;
+    sectionId?: string;
+    address?: string;
+    parentContact?: string;
+  },
+  imageFile?: File | null
+) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return { success: false, message: "Authentication required. Please login again." };
+    }
+
+    const formData = new FormData();
+
+    // Append all text fields
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value);
+      }
+    });
+
+    // Append image if provided
+    if (imageFile) {
+      formData.append("profileImage", imageFile);
+    }
+
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // ✅ Do NOT set Content-Type manually — fetch sets multipart/form-data with boundary automatically
+      },
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    console.log("updateUserWithImageAction response:", { status: response.status, success: result.success });
+
+    if (!response.ok || !result.success) {
+      if (response.status === 404) return { success: false, message: "User not found. They may have been deleted." };
+      if (response.status === 409) return { success: false, message: "Username or email already taken." };
+      if (response.status === 400) return { success: false, message: result.message || "Invalid data provided." };
+      return { success: false, message: result.message || "Failed to update user. Please try again." };
+    }
+
+    return { success: true, message: "User updated successfully!", data: result.data };
+  } catch (error: any) {
+    console.error("updateUserWithImageAction error:", error);
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
@@ -506,42 +443,24 @@ export async function uploadUserProfileImageAction(
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
-    const response = await fetch(
-      `${API_URL}/api/admin/users/${userId}/upload-image`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      }
-    );
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}/upload-image`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
 
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      return {
-        success: false,
-        message: result.message || "Failed to upload image. Please try again.",
-      };
+      return { success: false, message: result.message || "Failed to upload image. Please try again." };
     }
 
-    return { 
-      success: true, 
-      message: "Profile image uploaded successfully!",
-      data: result.data 
-    };
+    return { success: true, message: "Profile image uploaded successfully!", data: result.data };
   } catch (error: any) {
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }
 
@@ -554,52 +473,27 @@ export async function deleteUserAction(userId: string) {
     const token = cookieStore.get("auth_token")?.value;
 
     if (!token) {
-      return { 
-        success: false, 
-        message: "Authentication required. Please login again." 
-      };
+      return { success: false, message: "Authentication required. Please login again." };
     }
 
-    const response = await fetch(
-      `${API_URL}/api/admin/users/${userId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      if (response.status === 404) {
-        return {
-          success: false,
-          message: "User not found. They may have already been deleted.",
-        };
-      }
-      if (response.status === 403) {
-        return {
-          success: false,
-          message: "You don't have permission to delete this user.",
-        };
-      }
-      return {
-        success: false,
-        message: result.message || "Failed to delete user. Please try again.",
-      };
+      if (response.status === 404) return { success: false, message: "User not found. They may have already been deleted." };
+      if (response.status === 403) return { success: false, message: "You don't have permission to delete this user." };
+      return { success: false, message: result.message || "Failed to delete user. Please try again." };
     }
 
-    return { 
-      success: true, 
-      message: "User deleted successfully!" 
-    };
+    return { success: true, message: "User deleted successfully!" };
   } catch (error: any) {
-    return { 
-      success: false, 
-      message: "Network error. Please check your connection and try again." 
-    };
+    return { success: false, message: "Network error. Please check your connection and try again." };
   }
 }

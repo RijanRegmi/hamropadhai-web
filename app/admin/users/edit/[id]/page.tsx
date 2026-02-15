@@ -4,12 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   getUserByIdAction,
-  updateUserAction,
-  uploadUserProfileImageAction,
+  updateUserWithImageAction,
 } from "../../../../../lib/actions/admin-action";
 import toast from "react-hot-toast";
 import "./user-form.css";
 import PageHeader from "./../../../../_components/PageHeader";
+
 const CLASSES = ["11", "12"];
 const SECTIONS = ["A", "B", "C", "D", "E"];
 
@@ -38,7 +38,6 @@ export default function EditUserPage() {
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Image preview states
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -57,7 +56,6 @@ export default function EditUserPage() {
     parentContact: "",
   });
 
-  // For teacher: selected classes and sections per class
   const [selectedClasses, setSelectedClasses] = useState<string[]>([]);
   const [selectedSectionsPerClass, setSelectedSectionsPerClass] = useState<
     Record<string, string[]>
@@ -79,17 +77,14 @@ export default function EditUserPage() {
 
       setUser(result.data);
 
-      // Parse classId and sectionId based on role
       let parsedClassId = "";
       let parsedSectionId = "";
       let parsedSelectedClasses: string[] = [];
       let parsedSelectedSectionsPerClass: Record<string, string[]> = {};
 
       if (result.data.role === "teacher") {
-        // For teachers, parse class-section pairs from classId
         try {
           if (result.data.classId && result.data.classId.startsWith("[{")) {
-            // New format: [{"classId":"11","sections":["A","B"]},{"classId":"12","sections":["D"]}]
             const classSectionPairs = JSON.parse(result.data.classId);
             parsedSelectedClasses = classSectionPairs.map(
               (p: any) => p.classId,
@@ -105,13 +100,11 @@ export default function EditUserPage() {
             result.data.classId &&
             result.data.classId.startsWith("[")
           ) {
-            // Legacy format: separate arrays
             const oldClasses = JSON.parse(result.data.classId);
             const oldSections = result.data.sectionId
               ? JSON.parse(result.data.sectionId)
               : [];
             parsedSelectedClasses = oldClasses;
-            // In legacy format, all classes had all sections
             parsedSelectedSectionsPerClass = oldClasses.reduce(
               (acc: any, cls: string) => {
                 acc[cls] = oldSections;
@@ -120,7 +113,6 @@ export default function EditUserPage() {
               {},
             );
           } else if (result.data.classId) {
-            // Single value format
             parsedSelectedClasses = [result.data.classId];
             parsedSelectedSectionsPerClass = {
               [result.data.classId]: result.data.sectionId
@@ -129,12 +121,10 @@ export default function EditUserPage() {
             };
           }
         } catch (e) {
-          console.error("Error parsing teacher class/section:", e);
           parsedSelectedClasses = [];
           parsedSelectedSectionsPerClass = {};
         }
       } else {
-        // For students, use as single values
         parsedClassId = result.data.classId || "";
         parsedSectionId = result.data.sectionId || "";
       }
@@ -169,31 +159,30 @@ export default function EditUserPage() {
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
-
-    // Reset class/section selections when role changes
     if (name === "role") {
       setSelectedClasses([]);
       setSelectedSectionsPerClass({});
-      setForm((prev) => ({ ...prev, classId: "", sectionId: "" }));
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        classId: "",
+        sectionId: "",
+      }));
     }
   };
 
-  // Toggle class selection for teachers
   const toggleClass = (cls: string) => {
     if (selectedClasses.includes(cls)) {
-      // Remove class and its sections
       setSelectedClasses(selectedClasses.filter((c) => c !== cls));
       const newSections = { ...selectedSectionsPerClass };
       delete newSections[cls];
       setSelectedSectionsPerClass(newSections);
     } else {
-      // Add class
       setSelectedClasses([...selectedClasses, cls]);
       setSelectedSectionsPerClass({ ...selectedSectionsPerClass, [cls]: [] });
     }
   };
 
-  // Toggle section for a specific class
   const toggleSection = (cls: string, section: string) => {
     const currentSections = selectedSectionsPerClass[cls] || [];
     if (currentSections.includes(section)) {
@@ -209,8 +198,7 @@ export default function EditUserPage() {
     }
   };
 
-  const handleImageClick = () => fileInputRef.current?.click();
-
+  // ✅ FIX: Removed onClick on label — htmlFor handles click, no double dialog
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -224,14 +212,9 @@ export default function EditUserPage() {
       return;
     }
 
-    // Create preview URL
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewImage(reader.result as string);
-    };
+    reader.onloadend = () => setPreviewImage(reader.result as string);
     reader.readAsDataURL(file);
-
-    // Store the file for later upload
     setSelectedFile(file);
   };
 
@@ -239,95 +222,65 @@ export default function EditUserPage() {
     try {
       setIsSaving(true);
 
-      // Validation
       if (!form.fullName || !form.username || !form.email || !form.phone) {
         toast.error("Please fill in all required fields");
         return;
       }
 
-      // Role-specific validation and data preparation
       let finalClassId = "";
       let finalSectionId = "";
 
       if (form.role === "teacher") {
-        // Validate that at least one class is selected with sections
         if (selectedClasses.length === 0) {
           toast.error("Please select at least one class for teacher");
           return;
         }
-
-        // Check that all selected classes have at least one section
         const classesWithoutSections = selectedClasses.filter(
           (cls) =>
             !selectedSectionsPerClass[cls] ||
             selectedSectionsPerClass[cls].length === 0,
         );
-
         if (classesWithoutSections.length > 0) {
           toast.error(
             `Please select at least one section for: Class ${classesWithoutSections.join(", Class ")}`,
           );
           return;
         }
-
-        // Build class-section pairs array
         const classSectionPairs = selectedClasses.map((cls) => ({
           classId: cls,
           sections: selectedSectionsPerClass[cls] || [],
         }));
-
-        // Store as JSON string: [{"classId":"11","sections":["A","B"]},{"classId":"12","sections":["D","E"]}]
         finalClassId = JSON.stringify(classSectionPairs);
-        finalSectionId = ""; // Not used for teachers
+        finalSectionId = "";
       } else if (form.role === "user") {
         if (!form.classId || !form.sectionId) {
           toast.error("Please select class and section for student");
           return;
         }
-        // Store as single values for students
         finalClassId = form.classId;
         finalSectionId = form.sectionId;
       }
-      // Admin role: leave classId and sectionId empty
 
-      // First, upload the image if a new one was selected
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append("profileImage", selectedFile);
-
-        const imageResult = await uploadUserProfileImageAction(
-          userId,
-          formData,
-        );
-
-        if (!imageResult.success) {
-          toast.error(imageResult.message || "Failed to upload image");
-          setIsSaving(false);
-          return;
-        }
-      }
-
-      // Then update the user data
-      const updateData: any = {
-        fullName: form.fullName,
-        username: form.username,
-        email: form.email,
-        phone: form.phone,
-        gender: form.gender,
-        role: form.role,
-        about: form.about,
-        address: form.address,
-        parentContact: form.parentContact,
-        classId: finalClassId,
-        sectionId: finalSectionId,
-      };
-
-      // Only include password if it's been changed
-      if (form.password) {
-        updateData.password = form.password;
-      }
-
-      const result = await updateUserAction(userId, updateData);
+      // ✅ FIX: Send image + fields together as multipart/form-data
+      // PUT /api/admin/users/:id has multer middleware — handles file + text fields in one request
+      const result = await updateUserWithImageAction(
+        userId,
+        {
+          fullName: form.fullName,
+          username: form.username,
+          email: form.email,
+          phone: form.phone,
+          gender: form.gender,
+          role: form.role,
+          about: form.about,
+          address: form.address,
+          parentContact: form.parentContact,
+          classId: finalClassId,
+          sectionId: finalSectionId,
+          ...(form.password && { password: form.password }),
+        },
+        selectedFile,
+      );
 
       if (!result.success) {
         toast.error(result.message || "Failed to update user");
@@ -335,14 +288,9 @@ export default function EditUserPage() {
       }
 
       toast.success(result.message || "User updated successfully!");
-
-      // Clear preview and selected file
       setPreviewImage(null);
       setSelectedFile(null);
-
-      setTimeout(() => {
-        router.push("/admin/users");
-      }, 1000);
+      setTimeout(() => router.push("/admin/users"), 1000);
     } catch (error: any) {
       toast.error(error.message || "Failed to update user");
     } finally {
@@ -370,7 +318,6 @@ export default function EditUserPage() {
     ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:5050"}${user.profileImage}`
     : null;
 
-  // Use preview image if available, otherwise use the profile image
   const displayImage = previewImage || profileImageUrl;
 
   return (
@@ -403,7 +350,7 @@ export default function EditUserPage() {
           <h2 className="uf-card-title">Edit User</h2>
           <p className="uf-card-sub">Update user information</p>
 
-          {/* Profile Image Upload */}
+          {/* ✅ FIX: label htmlFor only — no onClick to avoid double file dialog */}
           <div className="uf-image-section">
             <label className="uf-label">Profile Image</label>
             <div className="uf-image-upload">
@@ -418,7 +365,6 @@ export default function EditUserPage() {
               <label
                 htmlFor="profileImage"
                 className="uf-image-label"
-                onClick={handleImageClick}
                 style={{ cursor: "pointer" }}
               >
                 {displayImage ? (
@@ -459,7 +405,6 @@ export default function EditUserPage() {
                 maxLength={50}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Username *</label>
               <input
@@ -472,12 +417,11 @@ export default function EditUserPage() {
                 autoComplete="username"
                 maxLength={20}
                 onInput={(e) => {
-                  const input = e.target as HTMLInputElement;
-                  input.value = input.value.toLowerCase();
+                  const i = e.target as HTMLInputElement;
+                  i.value = i.value.toLowerCase();
                 }}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Email *</label>
               <input
@@ -490,7 +434,6 @@ export default function EditUserPage() {
                 maxLength={64}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Phone *</label>
               <input
@@ -501,14 +444,12 @@ export default function EditUserPage() {
                 placeholder="+977 9800000000"
                 maxLength={10}
                 inputMode="numeric"
-                pattern="[0-9]*"
                 onInput={(e) => {
-                  const input = e.target as HTMLInputElement;
-                  input.value = input.value.replace(/[^0-9]/g, "");
+                  const i = e.target as HTMLInputElement;
+                  i.value = i.value.replace(/[^0-9]/g, "");
                 }}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">
                 Password (leave empty to keep current)
@@ -523,7 +464,6 @@ export default function EditUserPage() {
                 maxLength={35}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Gender *</label>
               <select
@@ -536,7 +476,6 @@ export default function EditUserPage() {
                 <option value="female">Female</option>
               </select>
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Role *</label>
               <select
@@ -550,7 +489,6 @@ export default function EditUserPage() {
                 <option value="admin">Admin</option>
               </select>
             </div>
-
             <div className="uf-field">
               <label className="uf-label">About</label>
               <input
@@ -564,10 +502,8 @@ export default function EditUserPage() {
             </div>
           </div>
 
-          {/* Class and Section Selection - Role-based */}
           {form.role === "teacher" && (
             <div className="uf-multi-select-section">
-              {/* Step 1: Select Classes */}
               <div className="uf-multi-select-group">
                 <label className="uf-label uf-label-multi">
                   Classes (Select one or more) *
@@ -603,7 +539,6 @@ export default function EditUserPage() {
                 </div>
               </div>
 
-              {/* Step 2: For each selected class, show sections */}
               {selectedClasses.length > 0 && (
                 <div style={{ marginTop: "24px" }}>
                   <label
@@ -704,7 +639,6 @@ export default function EditUserPage() {
                   ))}
                 </select>
               </div>
-
               <div className="uf-field">
                 <label className="uf-label">Section *</label>
                 <select
@@ -757,7 +691,6 @@ export default function EditUserPage() {
                 maxLength={35}
               />
             </div>
-
             <div className="uf-field">
               <label className="uf-label">Parent Contact</label>
               <input
@@ -768,10 +701,9 @@ export default function EditUserPage() {
                 placeholder="+977 9800000001"
                 maxLength={10}
                 inputMode="numeric"
-                pattern="[0-9]*"
                 onInput={(e) => {
-                  const input = e.target as HTMLInputElement;
-                  input.value = input.value.replace(/[^0-9]/g, "");
+                  const i = e.target as HTMLInputElement;
+                  i.value = i.value.replace(/[^0-9]/g, "");
                 }}
               />
             </div>
