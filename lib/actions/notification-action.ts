@@ -36,17 +36,25 @@ export async function getMyNotificationsAction() {
     const role = getRoleFromToken(token);
     if (!role || role === "admin") return { success: true, data: [] };
 
-    const response = await fetch(notificationBase(role), {
+    const url = notificationBase(role);
+    console.log("🔔 Fetching notifications from:", url);
+
+    const response = await fetch(url, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       cache: "no-store",
     });
 
+    console.log("🔔 Notifications response status:", response.status);
+
     const result = await safeJson(response);
+    console.log("🔔 Notifications result:", result);
+
     return result.success
       ? { success: true, data: result.data }
       : { success: false, message: result.message, data: [] };
   } catch (error: any) {
+    console.error("🔔 Notifications error:", error.message);
     return { success: false, message: error.message, data: [] };
   }
 }
