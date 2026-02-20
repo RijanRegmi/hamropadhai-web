@@ -335,15 +335,7 @@ export default function ProfilePage() {
 
             <button
               className="action-btn"
-              onClick={() =>
-                toast("Feature coming soon!", {
-                  icon: "🚀",
-                  style: {
-                    background: "#3b82f6",
-                    color: "#fff",
-                  },
-                })
-              }
+              onClick={() => router.push("/dashboard/profile/settings")}
             >
               <div className="action-btn-icon action-icon-orange">
                 <svg
@@ -647,15 +639,7 @@ export default function ProfilePage() {
 
               <button
                 className="desktop-action-btn"
-                onClick={() =>
-                  toast("Feature coming soon!", {
-                    icon: "🚀",
-                    style: {
-                      background: "#3b82f6",
-                      color: "#fff",
-                    },
-                  })
-                }
+                onClick={() => router.push("/dashboard/profile/settings")}
               >
                 <div className="desktop-action-icon action-icon-orange">
                   <svg

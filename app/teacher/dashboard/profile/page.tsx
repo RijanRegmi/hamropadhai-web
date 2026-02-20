@@ -342,15 +342,7 @@ export default function TeacherProfilePage() {
 
             <button
               className="teacher-action-btn"
-              onClick={() =>
-                toast("Feature coming soon!", {
-                  icon: "🚀",
-                  style: {
-                    background: "#3b82f6",
-                    color: "#fff",
-                  },
-                })
-              }
+              onClick={() => router.push("/teacher/dashboard/profile/settings")}
             >
               <div className="teacher-action-btn-icon teacher-action-icon-orange">
                 <svg
@@ -672,13 +664,7 @@ export default function TeacherProfilePage() {
               <button
                 className="teacher-desktop-action-btn"
                 onClick={() =>
-                  toast("Feature coming soon!", {
-                    icon: "🚀",
-                    style: {
-                      background: "#3b82f6",
-                      color: "#fff",
-                    },
-                  })
+                  router.push("/teacher/dashboard/profile/settings")
                 }
               >
                 <div className="teacher-desktop-action-icon teacher-action-icon-orange">

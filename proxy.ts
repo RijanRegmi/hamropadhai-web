@@ -52,7 +52,8 @@ export function proxy(req: NextRequest) {
 
     if (userRole === "teacher") {
       return NextResponse.redirect(
-        new URL("/teacher/teacher-dashboard", req.url)
+        // ✅ FIX: was "/teacher/teacher-dashboard" which doesn't exist
+        new URL("/teacher/dashboard", req.url)
       );
     }
 

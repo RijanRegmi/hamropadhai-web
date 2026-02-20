@@ -1,0 +1,247 @@
+/* ═══════════════════════════════════════════
+   not-found.css — 404 page for HamroPadhai
+═══════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+
+/* ── Root ── */
+.nf-root {
+  min-height: 100vh;
+  background: #eef0f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+/* ── Background blobs ── */
+.nf-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.18;
+  pointer-events: none;
+  animation: nf-drift 8s ease-in-out infinite alternate;
+}
+
+.nf-blob-1 {
+  width: 520px;
+  height: 520px;
+  background: #a020f0;
+  top: -160px;
+  left: -160px;
+  animation-delay: 0s;
+}
+
+.nf-blob-2 {
+  width: 380px;
+  height: 380px;
+  background: #7c3aed;
+  bottom: -100px;
+  right: -100px;
+  animation-delay: 2s;
+}
+
+.nf-blob-3 {
+  width: 260px;
+  height: 260px;
+  background: #a020f0;
+  top: 50%;
+  left: 60%;
+  animation-delay: 4s;
+}
+
+@keyframes nf-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.06); }
+}
+
+/* ── Card ── */
+.nf-card {
+  background: #fff;
+  border-radius: 28px;
+  padding: 48px 40px 36px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 8px 48px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  animation: nf-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes nf-rise {
+  from { opacity: 0; transform: translateY(32px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Brand ── */
+.nf-brand {
+  margin-bottom: 32px;
+}
+
+.nf-brand-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #a020f0, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+/* ── 404 number ── */
+.nf-number-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+  animation: nf-rise 0.6s 0.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nf-four {
+  font-family: 'Syne', sans-serif;
+  font-size: 96px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+  letter-spacing: -4px;
+}
+
+/* Zero — purple circle with sad face icon */
+.nf-zero-wrap {
+  position: relative;
+}
+
+.nf-zero {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a020f0 0%, #7c3aed 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(160, 32, 240, 0.35);
+  animation: nf-wobble 3s ease-in-out infinite;
+}
+
+@keyframes nf-wobble {
+  0%, 100% { transform: rotate(-4deg) scale(1); }
+  50%       { transform: rotate(4deg) scale(1.04); }
+}
+
+.nf-zero-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Text ── */
+.nf-text-section {
+  text-align: center;
+  margin-bottom: 28px;
+  animation: nf-rise 0.6s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nf-lost {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 10px;
+  letter-spacing: -0.5px;
+}
+
+.nf-desc {
+  font-size: 15px;
+  color: #6b7280;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── Divider ── */
+.nf-divider {
+  width: 100%;
+  height: 1px;
+  background: #f3f4f6;
+  margin-bottom: 28px;
+  animation: nf-rise 0.6s 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Actions ── */
+.nf-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  animation: nf-rise 0.6s 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nf-btn-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 15px 24px;
+  background: linear-gradient(135deg, #a020f0 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 4px 20px rgba(160, 32, 240, 0.3);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.nf-btn-primary:hover {
+  opacity: 0.92;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(160, 32, 240, 0.4);
+  color: #fff;
+}
+
+.nf-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ── Footer note ── */
+.nf-footer-note {
+  font-size: 12px;
+  color: #d1d5db;
+  margin: 20px 0 0;
+  letter-spacing: 0.03em;
+  animation: nf-rise 0.6s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Mobile ── */
+@media (max-width: 480px) {
+  .nf-card {
+    padding: 36px 24px 28px;
+    border-radius: 22px;
+  }
+
+  .nf-four {
+    font-size: 72px;
+  }
+
+  .nf-zero {
+    width: 76px;
+    height: 76px;
+  }
+
+  .nf-lost {
+    font-size: 24px;
+  }
+}
