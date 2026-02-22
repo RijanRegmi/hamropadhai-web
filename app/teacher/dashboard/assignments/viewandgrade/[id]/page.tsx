@@ -69,7 +69,6 @@ interface StudentWithSubmission extends Student {
 const getProfileImageUrl = (profileImage?: string) => {
   if (!profileImage) return null;
 
-  // If it's already a full URL, return as is
   if (
     profileImage.startsWith("http://") ||
     profileImage.startsWith("https://")
@@ -77,19 +76,19 @@ const getProfileImageUrl = (profileImage?: string) => {
     return profileImage;
   }
 
-  // If it starts with a slash, append to API_URL
   if (profileImage.startsWith("/")) {
     return `${API_URL}${profileImage}`;
   }
 
-  // Otherwise, assume it's a relative path and append
   return `${API_URL}/${profileImage}`;
 };
 
-// Helper function to handle file download
+// ✅ FIXED: prepend API_URL so files are fetched from Express, not Next.js
 const handleFileDownload = (fileUrl: string, fileName: string) => {
+  const fullUrl = fileUrl.startsWith("http") ? fileUrl : `${API_URL}${fileUrl}`;
+
   const link = document.createElement("a");
-  link.href = fileUrl;
+  link.href = fullUrl;
   link.download = fileName;
   link.target = "_blank";
   document.body.appendChild(link);
@@ -103,7 +102,6 @@ function StudentCard({ student, assignment, onGrade }: any) {
   const [imageError, setImageError] = useState(false);
   const profileUrl = getProfileImageUrl(student.profileImage);
 
-  // Get initials for avatar fallback
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -290,15 +288,6 @@ export default function TeacherAssignmentDetailPage() {
           "✅ Setting students from assignment data:",
           assignmentData.students.length,
         );
-
-        // Log profile image data for debugging
-        assignmentData.students.forEach((student: StudentWithSubmission) => {
-          console.log(`Student ${student.fullName}:`, {
-            profileImage: student.profileImage,
-            profileUrl: getProfileImageUrl(student.profileImage),
-          });
-        });
-
         setStudents(assignmentData.students);
       } else {
         console.error(

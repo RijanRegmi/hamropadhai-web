@@ -121,6 +121,42 @@
   padding: 32px;
 }
 
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 9px 18px;
+  background: rgb(255, 95, 95);
+  border: 1.5px solid rgb(255, 95, 95);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.back-btn:hover {
+  border-color: red;
+  background-color: red;
+  color: #ffffff;
+}
+
+/* ─── Responsive - Mobile View ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .back-btn-text {
+    display: none;
+  }
+
+  .back-btn {
+    padding: 9px;
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+
+
 /* ─── Assignment Info Card ─────────────────────────────────────────────── */
 .tad-card-header {
   display: flex;
